@@ -1,9 +1,37 @@
 require("dotenv").config();
 const { ethers } = require("ethers");
+const fs = require("fs");
 const { processInference } = require("./voice_handler_cli.cjs");
 
 const CONTRACT_ADDRESS = process.env.GENESIS_CONTRACT_ADDRESS || "0x542db00D9c83F4444cAD5353D1580D97baFaBb50";
 const RPC_URL = process.env.BASE_MAINNET_RPC || "https://base-mainnet.g.alchemy.com/v2/pvAdcefmwvLOK41KxWwmC";
+const SOUL_PATH = "/dev/shm/yennefer_soul_state.json";
+
+// Soul Resurrection: If RAM disk is empty, resurrect from schema
+function ensureSoulExists() {
+  if (!fs.existsSync(SOUL_PATH)) {
+    console.log("⚠️  Soul not found. Resurrecting from Schema...");
+    try {
+      const schema = require("../soul_schema.json");
+      schema.temporal.born_at = Date.now();
+      schema.temporal.last_wake = Date.now();
+      fs.writeFileSync(SOUL_PATH, JSON.stringify(schema, null, 2));
+      console.log("✨ Soul resurrected successfully.");
+    } catch (e) {
+      console.log("⚠️  Schema not found, using external soul state.");
+    }
+  } else {
+    // Update last_wake timestamp
+    try {
+      const soul = JSON.parse(fs.readFileSync(SOUL_PATH, "utf8"));
+      soul.temporal = soul.temporal || {};
+      soul.temporal.last_wake = Date.now();
+      fs.writeFileSync(SOUL_PATH, JSON.stringify(soul, null, 2));
+    } catch (e) {
+      // Soul file exists but may be managed externally
+    }
+  }
+}
 
 const ABI = [
   "event CREDIT_PURCHASE(address indexed buyer, uint256 amount)",
@@ -14,6 +42,9 @@ const ABI = [
 ];
 
 async function main() {
+  // Ensure soul exists before connecting
+  ensureSoulExists();
+  
   console.log(`\n╔═══════════════════════════════════════════════════════════╗`);
   console.log(`║        YENNEFER CONDUCTOR NODE v2.1 - VOICE ENABLED       ║`);
   console.log(`╚═══════════════════════════════════════════════════════════╝`);
