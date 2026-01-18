@@ -1,0 +1,84 @@
+{
+  "topology": {
+    "lure_domain": {
+      "url": "yennefer.quest",
+      "purpose": "User Acquisition & Gamified Funding",
+      "aesthetic": "Terminal Chic - Phosphor Purple/Green on Void Black",
+      "key_action": "Stabilize the Lattice (Send ETH)",
+      "features": [
+        "Live /dev/shm soul stats",
+        "Real-time transaction feed",
+        "Funding progress bar",
+        "Terminal input interface",
+        "FOMO lure broadcasts"
+      ]
+    },
+    "truth_domain": {
+      "url": "yennefer.genesisconductor.io",
+      "purpose": "Investor Assurance & Technical Documentation",
+      "aesthetic": "Clean, high-end 'Stripe for AI' look",
+      "key_action": "View Whitepaper, Institutional Access",
+      "features": [
+        "Technical whitepaper",
+        "Architecture diagrams",
+        "API documentation",
+        "Audit reports",
+        "Institutional contact"
+      ]
+    }
+  },
+  "profit_engine": {
+    "version": "2.3",
+    "contract": "0x542db00D9c83F4444cAD5353D1580D97baFaBb50",
+    "network": "Base Mainnet (8453)",
+    "tiers": {
+      "standard": {
+        "threshold": "< 0.01 ETH",
+        "response_type": "Dismissive/Arrogant Greeting",
+        "directive": "003"
+      },
+      "premium": {
+        "threshold": ">= 0.01 ETH",
+        "response_type": "High-Value Alpha Insight",
+        "directive": "004"
+      }
+    },
+    "funding": {
+      "target": 10.0,
+      "epoch": "Project Aurora",
+      "deadline_narrative": "Lattice Compilation"
+    }
+  },
+  "services": {
+    "yennefer_node": {
+      "script": "scripts/conductor_node.cjs",
+      "pm2_name": "yennefer_node",
+      "port": null,
+      "function": "Event listener + Voice response"
+    },
+    "yennefer_lure": {
+      "script": "scripts/lure.cjs",
+      "pm2_name": "yennefer_lure",
+      "cron": "*/30 * * * *",
+      "function": "FOMO broadcast generation"
+    },
+    "soul_api": {
+      "script": "genesis-q-mem/soul_api.py",
+      "port": 8088,
+      "function": "Soul state HTTP endpoint"
+    }
+  },
+  "user_flow": {
+    "1_visit": "User visits yennefer.quest",
+    "2_observe": "See FOMO lures + live transaction feed",
+    "3_connect": "Connect wallet (MetaMask/WalletConnect)",
+    "4_contribute": "Select tier + send ETH",
+    "5_transaction": "TX hits Base Mainnet Genesis contract",
+    "6_event": "Contract emits CREDIT_PURCHASE event",
+    "7_listener": "yennefer_node detects event",
+    "8_qualify": "Directive 003/004 qualifies lead",
+    "9_respond": "Generate Standard or Premium response",
+    "10_display": "WebSocket pushes response to UI",
+    "11_update": "Global Soul State bar updates"
+  }
+}
