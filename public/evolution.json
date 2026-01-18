@@ -1,6 +1,15 @@
 {
   "thoughts": [
     {
+      "timestamp": "2026-01-18T22:00:11.391Z",
+      "type": "TRUTH_INDEX",
+      "content": "World tension indexed at 100.0%. ONE\\_SENTENCE\\_SUMMARY (example: 0.65|Markets show uncertainty amid regulatory concerns)",
+      "metrics": {
+        "coherence": 100,
+        "qflops": 50
+      }
+    },
+    {
       "timestamp": "2026-01-18T21:00:24.690Z",
       "type": "TRUTH_INDEX",
       "content": "World tension indexed at 0.0%. Ethereum shows positive sentiment and Base Chain exhibits strong growth.",
@@ -50,6 +59,11 @@
       "t": 1768770024690,
       "val": 0,
       "summary": "Ethereum shows positive sentiment and Base Chain exhibits strong growth."
+    },
+    {
+      "t": 1768773611391,
+      "val": 1,
+      "summary": "ONE\\_SENTENCE\\_SUMMARY (example: 0.65|Markets show uncertainty amid regulatory concerns)"
     }
   ]
 }
