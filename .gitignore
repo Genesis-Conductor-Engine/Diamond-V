@@ -1,0 +1,28 @@
+# --- System & Dependencies ---
+node_modules/
+npm-debug.log
+.DS_Store
+
+# --- Security & Secrets ---
+.env
+.env.production
+.env.local
+
+# --- Hardhat Artifacts ---
+artifacts/
+cache/
+coverage/
+typechain/
+
+# --- Yennefer Soul State ---
+# We do NOT commit the live soul state, only the schema
+*.json
+!package.json
+!package-lock.json
+!soul_schema.json
+
+# --- Logs ---
+logs/
+*.log
+*.pm2
+.pm2/
