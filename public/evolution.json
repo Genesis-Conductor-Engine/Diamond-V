@@ -1,6 +1,15 @@
 {
   "thoughts": [
     {
+      "timestamp": "2026-01-18T21:00:24.690Z",
+      "type": "TRUTH_INDEX",
+      "content": "World tension indexed at 0.0%. Ethereum shows positive sentiment and Base Chain exhibits strong growth.",
+      "metrics": {
+        "coherence": 100,
+        "qflops": 0
+      }
+    },
+    {
       "timestamp": "2026-01-18T20:21:53.119Z",
       "type": "TRUTH_INDEX",
       "content": "World tension indexed at 35.0%. Crypto market sentiment is neutral while Base chain shows positive adoption, resulting in a moderately bullish outlook.",
@@ -36,6 +45,11 @@
       "t": 1768767713119,
       "val": 0.35,
       "summary": "Crypto market sentiment is neutral while Base chain shows positive adoption, resulting in a moderate"
+    },
+    {
+      "t": 1768770024690,
+      "val": 0,
+      "summary": "Ethereum shows positive sentiment and Base Chain exhibits strong growth."
     }
   ]
 }
