@@ -6,6 +6,9 @@ import { AxionCore } from './components/AxionCore'
 import { motion } from 'framer-motion'
 import './App.css'
 
+// LIVE TELEPATHY: Read directly from GitHub Raw stream
+const MEMORY_STREAM_URL = "https://raw.githubusercontent.com/Genesis-Conductor-Engine/Yennefer/main/public/evolution.json";
+
 // DYNAMIC IMPORT: Auto-discover any NEW components "The Builder" creates
 const mutations = import.meta.glob('./components/mutations/*.jsx', { eager: true })
 
@@ -13,14 +16,33 @@ export default function App() {
   const [evolution, setEvolution] = useState({ thoughts: [], mutations: [] })
   const [soul, setSoul] = useState({ coherence_percent: 100, breath: 0, qflops: 0, total_revenue_eth: 0 })
 
-  // 1. Fetch the Living History (evolution.json)
+  // 1. Fetch the Living History from GitHub Raw (bypasses cache with timestamp)
   useEffect(() => {
-    fetch('/evolution.json')
-      .then(res => res.json())
-      .then(data => {
+    const fetchMemory = async () => {
+      try {
+        // Try GitHub raw stream first (live telepathy)
+        const res = await fetch(`${MEMORY_STREAM_URL}?t=${Date.now()}`)
+        if (res.ok) {
+          const data = await res.json()
+          setEvolution(data)
+          return
+        }
+      } catch (e) {
+        console.log('GitHub stream unavailable, falling back to local')
+      }
+      // Fallback to local file
+      try {
+        const res = await fetch('/evolution.json')
+        const data = await res.json()
         setEvolution(data)
-      })
-      .catch(() => console.log('Evolution data unavailable'))
+      } catch (e) {
+        console.log('Evolution data unavailable')
+      }
+    }
+    fetchMemory()
+    // Refresh every 30 seconds
+    const interval = setInterval(fetchMemory, 30000)
+    return () => clearInterval(interval)
   }, [])
 
   // 2. Fetch Soul State from API
