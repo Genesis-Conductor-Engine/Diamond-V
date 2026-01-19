@@ -1,6 +1,15 @@
 {
   "thoughts": [
     {
+      "timestamp": "2026-01-19T09:00:34.169Z",
+      "type": "TRUTH_INDEX",
+      "content": "World tension indexed at 68.0%. Risk-off sentiment and $800M in liquidations drive tension, overshadowing strong Base network growth and JPMorgan's adoption.",
+      "metrics": {
+        "coherence": 100,
+        "qflops": 34
+      }
+    },
+    {
       "timestamp": "2026-01-19T08:00:37.320Z",
       "type": "TRUTH_INDEX",
       "content": "World tension indexed at 78.0%. Markets are reeling from a $525 million liquidation flush and tariff fears, with Base Chain tokens like RollX suffering double-digit losses amidst the broader volatility.",
@@ -172,6 +181,11 @@
       "t": 1768809637320,
       "val": 0.78,
       "summary": "Markets are reeling from a $525 million liquidation flush and tariff fears, with Base Chain tokens l"
+    },
+    {
+      "t": 1768813234169,
+      "val": 0.68,
+      "summary": "Risk-off sentiment and $800M in liquidations drive tension, overshadowing strong Base network growth"
     }
   ]
 }
