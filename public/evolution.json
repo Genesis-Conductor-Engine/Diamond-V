@@ -1,6 +1,15 @@
 {
   "thoughts": [
     {
+      "timestamp": "2026-01-19T10:00:39.435Z",
+      "type": "TRUTH_INDEX",
+      "content": "World tension indexed at 75.0%. Broader crypto markets are suffering a sharp correction with $800M in liquidations, contrasting sharply with Base Chain's record-breaking activity and ecosystem expansion.",
+      "metrics": {
+        "coherence": 100,
+        "qflops": 37.5
+      }
+    },
+    {
       "timestamp": "2026-01-19T09:00:34.169Z",
       "type": "TRUTH_INDEX",
       "content": "World tension indexed at 68.0%. Risk-off sentiment and $800M in liquidations drive tension, overshadowing strong Base network growth and JPMorgan's adoption.",
@@ -186,6 +195,11 @@
       "t": 1768813234169,
       "val": 0.68,
       "summary": "Risk-off sentiment and $800M in liquidations drive tension, overshadowing strong Base network growth"
+    },
+    {
+      "t": 1768816839435,
+      "val": 0.75,
+      "summary": "Broader crypto markets are suffering a sharp correction with $800M in liquidations, contrasting shar"
     }
   ]
 }
