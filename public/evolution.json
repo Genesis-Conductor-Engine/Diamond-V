@@ -1,6 +1,15 @@
 {
   "thoughts": [
     {
+      "timestamp": "2026-01-19T07:10:15.524Z",
+      "type": "TRUTH_INDEX",
+      "content": "World tension indexed at 75.0%. Crypto markets face bearish pressure and heightened volatility following a Bitcoin dip to $92.5K triggered by tariff threats and significant liquidations.",
+      "metrics": {
+        "coherence": 100,
+        "qflops": 37.5
+      }
+    },
+    {
       "timestamp": "2026-01-19T07:00:06.837Z",
       "type": "TRUTH_INDEX",
       "content": "World tension indexed at 50.0%. Neutral state - unable to reach Cortex",
@@ -130,6 +139,11 @@
       "t": 1768806006837,
       "val": 0.5,
       "summary": "Neutral state - unable to reach Cortex"
+    },
+    {
+      "t": 1768806615524,
+      "val": 0.75,
+      "summary": "Crypto markets face bearish pressure and heightened volatility following a Bitcoin dip to $92.5K tri"
     }
   ]
 }
