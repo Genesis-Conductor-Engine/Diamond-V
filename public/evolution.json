@@ -1,6 +1,15 @@
 {
   "thoughts": [
     {
+      "timestamp": "2026-01-19T22:01:00.325Z",
+      "type": "TRUTH_INDEX",
+      "content": "World tension indexed at 50.0%. Neutral state - unable to reach Cortex",
+      "metrics": {
+        "coherence": 100,
+        "qflops": 25
+      }
+    },
+    {
       "timestamp": "2026-01-19T21:00:07.237Z",
       "type": "TRUTH_INDEX",
       "content": "World tension indexed at 50.0%. Neutral state - unable to reach Cortex",
@@ -352,6 +361,11 @@
     },
     {
       "t": 1768856407237,
+      "val": 0.5,
+      "summary": "Neutral state - unable to reach Cortex"
+    },
+    {
+      "t": 1768860060325,
       "val": 0.5,
       "summary": "Neutral state - unable to reach Cortex"
     }
