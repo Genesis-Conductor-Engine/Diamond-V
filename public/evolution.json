@@ -1,6 +1,15 @@
 {
   "thoughts": [
     {
+      "timestamp": "2026-01-19T15:00:28.010Z",
+      "type": "TRUTH_INDEX",
+      "content": "World tension indexed at 88.0%. Crypto markets face a significant downturn with heavy liquidations driven by geopolitical tensions, despite Base Chain's continued strong fee generation.",
+      "metrics": {
+        "coherence": 100,
+        "qflops": 44
+      }
+    },
+    {
       "timestamp": "2026-01-19T14:00:51.487Z",
       "type": "TRUTH_INDEX",
       "content": "World tension indexed at 68.0%. Significant leverage flush and risk-off sentiment shake broader markets, while Base Chain demonstrates resilience with record transaction volumes.",
@@ -256,6 +265,11 @@
       "t": 1768831251487,
       "val": 0.68,
       "summary": "Significant leverage flush and risk-off sentiment shake broader markets, while Base Chain demonstrat"
+    },
+    {
+      "t": 1768834828010,
+      "val": 0.88,
+      "summary": "Crypto markets face a significant downturn with heavy liquidations driven by geopolitical tensions, "
     }
   ]
 }
