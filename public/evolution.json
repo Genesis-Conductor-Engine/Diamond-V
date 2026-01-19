@@ -1,6 +1,15 @@
 {
   "thoughts": [
     {
+      "timestamp": "2026-01-19T08:00:37.320Z",
+      "type": "TRUTH_INDEX",
+      "content": "World tension indexed at 78.0%. Markets are reeling from a $525 million liquidation flush and tariff fears, with Base Chain tokens like RollX suffering double-digit losses amidst the broader volatility.",
+      "metrics": {
+        "coherence": 100,
+        "qflops": 39
+      }
+    },
+    {
       "timestamp": "2026-01-19T07:11:40.239Z",
       "type": "TRUTH_INDEX",
       "content": "World tension indexed at 82.0%. Crypto markets plunge with 'fear' sentiment and heavy liquidations, though Base Chain activity remains robust.",
@@ -158,6 +167,11 @@
       "t": 1768806700239,
       "val": 0.82,
       "summary": "Crypto markets plunge with 'fear' sentiment and heavy liquidations, though Base Chain activity remai"
+    },
+    {
+      "t": 1768809637320,
+      "val": 0.78,
+      "summary": "Markets are reeling from a $525 million liquidation flush and tariff fears, with Base Chain tokens l"
     }
   ]
 }
