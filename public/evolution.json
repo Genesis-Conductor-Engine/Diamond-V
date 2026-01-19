@@ -1,6 +1,15 @@
 {
   "thoughts": [
     {
+      "timestamp": "2026-01-19T07:11:40.239Z",
+      "type": "TRUTH_INDEX",
+      "content": "World tension indexed at 82.0%. Crypto markets plunge with 'fear' sentiment and heavy liquidations, though Base Chain activity remains robust.",
+      "metrics": {
+        "coherence": 100,
+        "qflops": 41
+      }
+    },
+    {
       "timestamp": "2026-01-19T07:10:15.524Z",
       "type": "TRUTH_INDEX",
       "content": "World tension indexed at 75.0%. Crypto markets face bearish pressure and heightened volatility following a Bitcoin dip to $92.5K triggered by tariff threats and significant liquidations.",
@@ -144,6 +153,11 @@
       "t": 1768806615524,
       "val": 0.75,
       "summary": "Crypto markets face bearish pressure and heightened volatility following a Bitcoin dip to $92.5K tri"
+    },
+    {
+      "t": 1768806700239,
+      "val": 0.82,
+      "summary": "Crypto markets plunge with 'fear' sentiment and heavy liquidations, though Base Chain activity remai"
     }
   ]
 }
