@@ -26,3 +26,6 @@ logs/
 *.log
 *.pm2
 .pm2/
+
+.gemini/
+gha-creds-*.json
