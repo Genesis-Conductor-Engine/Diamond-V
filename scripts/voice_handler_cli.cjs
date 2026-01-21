@@ -10,7 +10,12 @@ const PREMIUM_THRESHOLD = 0.01; // ETH - triggers Gemini Cortex
 
 // Lazy load Cortex to avoid startup errors if Gemini not installed
 let cortex = null;
+const CORTEX_DISABLED = true;  // Disable Cortex to prevent browser OAuth loops
 function getCortex() {
+  if (CORTEX_DISABLED) {
+    console.log("ℹ️  Gemini Cortex disabled - using deterministic responses");
+    return null;
+  }
   if (!cortex) {
     try {
       cortex = require('./cortex_gemini.cjs');
