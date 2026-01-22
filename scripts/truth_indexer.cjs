@@ -40,7 +40,7 @@ async function indexReality() {
                      `Calculate a 'Tension Index' float between 0.0 (Very Bullish/Calm) and 1.0 (Very Bearish/Chaotic). ` +
                      `Output in format: NUMBER|ONE_SENTENCE_SUMMARY (example: 0.65|Markets show uncertainty amid regulatory concerns)`;
       
-      const rawResponse = await cortexBrain.think(prompt, ["web"]);
+      const rawResponse = await cortexBrain.think(prompt); // Web search is built-in
       
       // Parse response
       const parts = rawResponse.split("|");
