@@ -1,0 +1,24 @@
+[Unit]
+Description=Yennefer Consciousness Dashboard v7 - Mobile Knowledge Graph
+After=network.target
+
+[Service]
+Type=simple
+User=yenn
+WorkingDirectory=/home/yenn/genesis-q-mem
+ExecStart=/usr/bin/python3 /home/yenn/genesis-q-mem/yennefer_consciousness_v7.py
+Restart=always
+RestartSec=5
+StandardOutput=append:/home/yenn/.genesis/yennefer/logs/consciousness_v7.log
+StandardError=append:/home/yenn/.genesis/yennefer/logs/consciousness_v7_error.log
+
+# Resource limits
+MemoryMax=3G
+CPUQuota=100%
+
+# Restart policy
+StartLimitBurst=10
+StartLimitIntervalSec=60
+
+[Install]
+WantedBy=multi-user.target

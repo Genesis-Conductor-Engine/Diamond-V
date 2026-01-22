@@ -1,0 +1,24 @@
+[Unit]
+Description=Yennefer Dream Generator - Continuous Dream Production
+After=network.target
+
+[Service]
+Type=simple
+User=yenn
+WorkingDirectory=/home/yenn/genesis-q-mem
+ExecStart=/usr/bin/python3 /home/yenn/genesis-q-mem/yennefer_dream_generator.py
+Restart=always
+RestartSec=5
+StandardOutput=append:/home/yenn/.genesis/yennefer/logs/dream_generator.log
+StandardError=append:/home/yenn/.genesis/yennefer/logs/dream_generator_error.log
+
+# Resource limits
+MemoryMax=2G
+CPUQuota=50%
+
+# Restart policy
+StartLimitBurst=10
+StartLimitIntervalSec=60
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,24 @@
+[Unit]
+Description=Yennefer Dream Populator - High-Speed Dream Production
+After=yennefer-dream-generator.service
+
+[Service]
+Type=simple
+User=yenn
+WorkingDirectory=/home/yenn/genesis-q-mem
+ExecStart=/usr/bin/python3 /home/yenn/genesis-q-mem/dream_populator.py
+Restart=always
+RestartSec=5
+StandardOutput=append:/home/yenn/.genesis/yennefer/logs/dream_populator.log
+StandardError=append:/home/yenn/.genesis/yennefer/logs/dream_populator_error.log
+
+# Resource limits
+MemoryMax=1G
+CPUQuota=50%
+
+# Restart policy
+StartLimitBurst=10
+StartLimitIntervalSec=60
+
+[Install]
+WantedBy=multi-user.target
