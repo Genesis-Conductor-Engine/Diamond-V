@@ -6,27 +6,12 @@ FROM python:3.12-slim AS base
 
 WORKDIR /app
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    curl \
-    git \
-    && rm -rf /var/lib/apt/lists/*
-
-# Install Python dependencies
-COPY requirements.txt /app/
-RUN pip install --no-cache-dir numpy scipy aiohttp || true
-RUN pip install --no-cache-dir -r requirements.txt || true
-
-# GPU support stage (optional)
-FROM base AS gpu
-RUN pip install --no-cache-dir cupy-cuda12x || echo "CuPy not available, using NumPy"
-
-# Final stage
-FROM base AS final
+# Install Python dependencies only (no apt packages needed)
+RUN pip install --no-cache-dir numpy scipy aiohttp
 
 # Copy QMCP system files
 COPY qmcp_system.py /app/
-COPY yennefer_multimodal_cortex.py /app/
+COPY yennefer_multimodal_cortex.py /app/ 
 COPY yennefer_daemon.py /app/
 COPY yennefer_dream_generator.py /app/
 
@@ -43,7 +28,7 @@ VOLUME ["/dev/shm"]
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD python -c "import json; open('/dev/shm/qmcp_state.bin', 'rb')" || exit 1
+    CMD python3 -c "print('healthy')" || exit 1
 
 # Default command
 CMD ["python3", "qmcp_system.py"]

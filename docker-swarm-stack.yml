@@ -19,11 +19,6 @@ services:
         constraints:
           - node.labels.gpu == true
       resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [gpu]
         limits:
           memory: 2G
       restart_policy:
