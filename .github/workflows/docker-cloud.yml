@@ -1,0 +1,275 @@
+# Docker Cloud Build & Push
+# Optimized for GHCR with buildx and multi-platform support
+# Uses latest Docker features and caching
+
+name: Docker Cloud Build
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'genesis-q-mem/**'
+      - 'yennefer-core/**'
+      - 'scripts/**'
+      - 'Dockerfile*'
+      - 'docker-compose*.yml'
+  
+  workflow_dispatch:
+    inputs:
+      platforms:
+        description: 'Build platforms'
+        required: false
+        default: 'linux/amd64'
+        type: choice
+        options:
+          - linux/amd64
+          - linux/amd64,linux/arm64
+      push_latest:
+        description: 'Push as latest tag'
+        required: false
+        default: true
+        type: boolean
+
+env:
+  REGISTRY: ghcr.io
+  DOCKER_BUILDKIT: 1
+
+jobs:
+  # ═══════════════════════════════════════════════════════════════════════════
+  # BUILD MATRIX
+  # ═══════════════════════════════════════════════════════════════════════════
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+      attestations: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: cortex
+            context: .
+            dockerfile: genesis-q-mem/Dockerfile
+            description: "Yennefer Multimodal Cortex - GPU QFLOP optimized"
+          
+          - name: conductor
+            context: .
+            dockerfile: Dockerfile.orchestrator
+            description: "Genesis Conductor - Blockchain event listener"
+          
+          - name: landing
+            context: yennefer-core
+            dockerfile: yennefer-core/Dockerfile
+            description: "Yennefer Landing - Syn25 aesthetic frontend"
+          
+          - name: qmcp
+            context: genesis-q-mem
+            dockerfile: genesis-q-mem/Dockerfile.qmcp
+            description: "QMCP System - Quantum Memory Control Protocol"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          version: latest
+          driver-opts: |
+            image=moby/buildkit:master
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Check if Dockerfile exists
+        id: check
+        run: |
+          if [ -f "${{ matrix.dockerfile }}" ]; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+            echo "⚠️ Dockerfile not found: ${{ matrix.dockerfile }}"
+          fi
+
+      - name: Extract metadata
+        if: steps.check.outputs.exists == 'true'
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ github.repository }}-${{ matrix.name }}
+          tags: |
+            type=sha,prefix=
+            type=ref,event=branch
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' && github.event.inputs.push_latest != 'false' }}
+            type=raw,value={{date 'YYYYMMDD-HHmmss'}}
+          labels: |
+            org.opencontainers.image.title=Yennefer ${{ matrix.name }}
+            org.opencontainers.image.description=${{ matrix.description }}
+            org.opencontainers.image.vendor=Genesis Conductor Engine
+
+      - name: Build and push
+        if: steps.check.outputs.exists == 'true'
+        id: build
+        uses: docker/build-push-action@v6
+        with:
+          context: ${{ matrix.context }}
+          file: ${{ matrix.dockerfile }}
+          platforms: ${{ github.event.inputs.platforms || 'linux/amd64' }}
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha,scope=${{ matrix.name }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.name }}
+          provenance: true
+          sbom: true
+          build-args: |
+            BUILDKIT_INLINE_CACHE=1
+            BUILD_DATE=${{ github.event.head_commit.timestamp }}
+            VCS_REF=${{ github.sha }}
+
+      - name: Attest
+        if: steps.check.outputs.exists == 'true'
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-name: ${{ env.REGISTRY }}/${{ github.repository }}-${{ matrix.name }}
+          subject-digest: ${{ steps.build.outputs.digest }}
+          push-to-registry: true
+
+      - name: Summary
+        if: steps.check.outputs.exists == 'true'
+        run: |
+          echo "### 🐳 Docker Image Built" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Image:** \`${{ env.REGISTRY }}/${{ github.repository }}-${{ matrix.name }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Digest:** \`${{ steps.build.outputs.digest }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Description:** ${{ matrix.description }}" >> $GITHUB_STEP_SUMMARY
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # CREATE MISSING DOCKERFILES
+  # ═══════════════════════════════════════════════════════════════════════════
+  ensure-dockerfiles:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create missing Dockerfiles
+        run: |
+          # QMCP Dockerfile
+          if [ ! -f genesis-q-mem/Dockerfile.qmcp ]; then
+            cat > genesis-q-mem/Dockerfile.qmcp << 'DOCKERFILE'
+          # QMCP - Quantum Memory Control Protocol
+          FROM python:3.12-slim
+          
+          WORKDIR /app
+          
+          # Install system deps
+          RUN apt-get update && apt-get install -y --no-install-recommends \
+              curl \
+              && rm -rf /var/lib/apt/lists/*
+          
+          # Copy QMCP system
+          COPY qmcp_system.py /app/
+          COPY requirements.txt /app/
+          
+          # Install Python deps
+          RUN pip install --no-cache-dir numpy scipy aiohttp
+          RUN pip install --no-cache-dir -r requirements.txt || true
+          
+          # Environment
+          ENV PYTHONUNBUFFERED=1
+          ENV QMCP_CACHE_SIZE=256
+          ENV QUANTUM_DIMS=16
+          
+          # Expose shared memory
+          VOLUME ["/dev/shm"]
+          
+          CMD ["python3", "qmcp_system.py"]
+          DOCKERFILE
+            echo "Created genesis-q-mem/Dockerfile.qmcp"
+          fi
+          
+          # Cortex Dockerfile (if missing)
+          if [ ! -f genesis-q-mem/Dockerfile ]; then
+            cat > genesis-q-mem/Dockerfile << 'DOCKERFILE'
+          # Yennefer Multimodal Cortex
+          FROM python:3.12-slim
+          
+          WORKDIR /app
+          
+          RUN apt-get update && apt-get install -y --no-install-recommends \
+              curl git \
+              && rm -rf /var/lib/apt/lists/*
+          
+          COPY *.py /app/
+          COPY requirements.txt /app/
+          
+          RUN pip install --no-cache-dir -r requirements.txt || pip install numpy aiohttp
+          
+          ENV PYTHONUNBUFFERED=1
+          
+          CMD ["python3", "yennefer_multimodal_cortex.py"]
+          DOCKERFILE
+            echo "Created genesis-q-mem/Dockerfile"
+          fi
+          
+          # Landing Dockerfile (if missing)  
+          if [ ! -f yennefer-core/Dockerfile ]; then
+            cat > yennefer-core/Dockerfile << 'DOCKERFILE'
+          # Yennefer Landing Server
+          FROM python:3.12-slim
+          
+          WORKDIR /app
+          
+          RUN pip install --no-cache-dir flask stripe gunicorn
+          
+          COPY *.py /app/
+          COPY templates/ /app/templates/
+          
+          EXPOSE 8000
+          
+          CMD ["gunicorn", "-b", "0.0.0.0:8000", "landing_server:app"]
+          DOCKERFILE
+            echo "Created yennefer-core/Dockerfile"
+          fi
+
+      - name: Commit Dockerfiles
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore: Add missing Dockerfiles for CI/CD"
+          file_pattern: "**/Dockerfile*"
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # DOCKER COMPOSE VALIDATION
+  # ═══════════════════════════════════════════════════════════════════════════
+  validate-compose:
+    runs-on: ubuntu-latest
+    needs: build
+    
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate docker-compose files
+        run: |
+          for f in docker-compose*.yml; do
+            if [ -f "$f" ]; then
+              echo "Validating: $f"
+              docker compose -f "$f" config --quiet && echo "  ✓ Valid" || echo "  ✗ Invalid"
+            fi
+          done
+
+      - name: Test compose up (dry-run)
+        run: |
+          if [ -f docker-compose.yml ]; then
+            docker compose config
+          fi

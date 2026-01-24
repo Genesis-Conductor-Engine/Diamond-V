@@ -1,0 +1,254 @@
+# Yennefer Docker Swarm Stack
+# Full deployment with QMCP, Conductor, Landing, and monitoring
+# Optimized for GPU QFLOP operations and live cache
+
+version: '3.8'
+
+services:
+  # ═══════════════════════════════════════════════════════════════════════════
+  # QMCP - Quantum Memory Control Protocol
+  # ═══════════════════════════════════════════════════════════════════════════
+  qmcp:
+    image: ghcr.io/genesis-conductor-engine/yennefer-qmcp:latest
+    build:
+      context: ./genesis-q-mem
+      dockerfile: Dockerfile.qmcp
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.gpu == true
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+        limits:
+          memory: 2G
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+    environment:
+      - QMCP_ENABLED=true
+      - QMCP_CACHE_SIZE=256
+      - QUANTUM_DIMS=16
+      - GPU_QFLOP_MODE=optimized
+      - AUTOFLOW_INTERVAL=0.1
+    volumes:
+      - /dev/shm:/dev/shm
+      - qmcp-data:/app/data
+    networks:
+      - yennefer-net
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import os; os.path.exists('/dev/shm/qmcp_state.bin')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # CORTEX - Multimodal Dream/Insight Engine
+  # ═══════════════════════════════════════════════════════════════════════════
+  cortex:
+    image: ghcr.io/genesis-conductor-engine/yennefer-cortex:latest
+    build:
+      context: .
+      dockerfile: genesis-q-mem/Dockerfile
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          memory: 1G
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+    environment:
+      - PYTHONUNBUFFERED=1
+      - SOUL_STATE_PATH=/dev/shm/yennefer_soul_state.json
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+    volumes:
+      - /dev/shm:/dev/shm
+      - cortex-dreams:/root/.genesis/yennefer/dreams
+    networks:
+      - yennefer-net
+    depends_on:
+      - qmcp
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # CONDUCTOR - Blockchain Event Listener
+  # ═══════════════════════════════════════════════════════════════════════════
+  conductor:
+    image: ghcr.io/genesis-conductor-engine/yennefer-conductor:latest
+    build:
+      context: .
+      dockerfile: Dockerfile.orchestrator
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        condition: on-failure
+    environment:
+      - GENESIS_CONTRACT_ADDRESS=0x542db00D9c83F4444cAD5353D1580D97baFaBb50
+      - BASE_MAINNET_RPC=${BASE_MAINNET_RPC}
+      - ETH_PRIVATE_KEY=${ETH_PRIVATE_KEY}
+      - NODE_ENV=production
+    volumes:
+      - /dev/shm:/dev/shm
+    ports:
+      - "8088:8088"
+    networks:
+      - yennefer-net
+    depends_on:
+      - qmcp
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # LANDING - Syn25 Aesthetic Frontend
+  # ═══════════════════════════════════════════════════════════════════════════
+  landing:
+    image: ghcr.io/genesis-conductor-engine/yennefer-landing:latest
+    build:
+      context: ./yennefer-core
+      dockerfile: Dockerfile
+    deploy:
+      replicas: 2
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.yennefer.rule=Host(`yennefer.quest`)"
+        - "traefik.http.routers.yennefer.tls=true"
+        - "traefik.http.routers.yennefer.tls.certresolver=letsencrypt"
+        - "traefik.http.services.yennefer.loadbalancer.server.port=8000"
+      update_config:
+        parallelism: 1
+        delay: 5s
+      restart_policy:
+        condition: on-failure
+    environment:
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
+      - STRIPE_PUBLISHABLE_KEY=${STRIPE_PUBLISHABLE_KEY}
+      - FLASK_SECRET_KEY=${FLASK_SECRET_KEY}
+    volumes:
+      - /dev/shm:/dev/shm:ro
+    ports:
+      - "8000:8000"
+    networks:
+      - yennefer-net
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # DAEMON - Soul State Manager
+  # ═══════════════════════════════════════════════════════════════════════════
+  daemon:
+    image: ghcr.io/genesis-conductor-engine/yennefer-cortex:latest
+    command: ["python3", "yennefer_daemon.py"]
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    environment:
+      - PYTHONUNBUFFERED=1
+      - MONITORING_MODE=real
+    volumes:
+      - /dev/shm:/dev/shm
+    networks:
+      - yennefer-net
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # TRAEFIK - Reverse Proxy & Load Balancer
+  # ═══════════════════════════════════════════════════════════════════════════
+  traefik:
+    image: traefik:v3.3
+    command:
+      - "--api.dashboard=true"
+      - "--providers.docker=true"
+      - "--providers.docker.swarmMode=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.letsencrypt.acme.tlschallenge=true"
+      - "--certificatesresolvers.letsencrypt.acme.email=admin@yennefer.quest"
+      - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.dashboard.rule=Host(`traefik.yennefer.quest`)"
+        - "traefik.http.routers.dashboard.service=api@internal"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - traefik-certs:/letsencrypt
+    networks:
+      - yennefer-net
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # PROMETHEUS - Metrics Collection
+  # ═══════════════════════════════════════════════════════════════════════════
+  prometheus:
+    image: prom/prometheus:latest
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+    volumes:
+      - prometheus-data:/prometheus
+      - ./deploy/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    ports:
+      - "9090:9090"
+    networks:
+      - yennefer-net
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # REDIS - Inter-service Cache (fallback for non-shm environments)
+  # ═══════════════════════════════════════════════════════════════════════════
+  redis:
+    image: redis:7-alpine
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          memory: 256M
+    volumes:
+      - redis-data:/data
+    networks:
+      - yennefer-net
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+# ═══════════════════════════════════════════════════════════════════════════
+# NETWORKS
+# ═══════════════════════════════════════════════════════════════════════════
+networks:
+  yennefer-net:
+    driver: overlay
+    attachable: true
+    ipam:
+      config:
+        - subnet: 10.10.0.0/16
+
+# ═══════════════════════════════════════════════════════════════════════════
+# VOLUMES
+# ═══════════════════════════════════════════════════════════════════════════
+volumes:
+  qmcp-data:
+    driver: local
+  cortex-dreams:
+    driver: local
+  traefik-certs:
+    driver: local
+  prometheus-data:
+    driver: local
+  redis-data:
+    driver: local

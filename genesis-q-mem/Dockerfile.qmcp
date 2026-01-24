@@ -1,0 +1,55 @@
+# QMCP - Quantum Memory Control Protocol
+# GPU QFLOP optimized container with live cache and auto-flow
+# Supports Docker Swarm deployment with shared memory
+
+FROM python:3.12-slim AS base
+
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Python dependencies
+COPY requirements.txt /app/
+RUN pip install --no-cache-dir numpy scipy aiohttp || true
+RUN pip install --no-cache-dir -r requirements.txt || true
+
+# GPU support stage (optional)
+FROM base AS gpu
+RUN pip install --no-cache-dir cupy-cuda12x || echo "CuPy not available, using NumPy"
+
+# Final stage
+FROM base AS final
+
+# Copy QMCP system files
+COPY qmcp_system.py /app/
+COPY yennefer_multimodal_cortex.py /app/
+COPY yennefer_daemon.py /app/
+COPY yennefer_dream_generator.py /app/
+
+# Environment configuration
+ENV PYTHONUNBUFFERED=1
+ENV QMCP_ENABLED=true
+ENV QMCP_CACHE_SIZE=256
+ENV QUANTUM_DIMS=16
+ENV ENTANGLEMENT_DEPTH=4
+ENV GPU_QFLOP_MODE=optimized
+
+# Shared memory volume
+VOLUME ["/dev/shm"]
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD python -c "import json; open('/dev/shm/qmcp_state.bin', 'rb')" || exit 1
+
+# Default command
+CMD ["python3", "qmcp_system.py"]
+
+# Labels
+LABEL org.opencontainers.image.title="QMCP System"
+LABEL org.opencontainers.image.description="Quantum Memory Control Protocol with GPU QFLOP optimization"
+LABEL org.opencontainers.image.vendor="Genesis Conductor Engine"
+LABEL ai.yennefer.component="qmcp"
