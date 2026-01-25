@@ -174,7 +174,7 @@ jobs:
   # ═══════════════════════════════════════════════════════════════════════════
   gpu-worker:
     name: "⚡ GPU Worker"
-    runs-on: ubuntu-gpu  # GitHub-hosted NVIDIA T4 GPU runner
+    runs-on: GPU  # Genesis-Conductor-Engine GPU runner (NVIDIA Tesla T4, 16GB VRAM)
     timeout-minutes: 60
     
     outputs:
