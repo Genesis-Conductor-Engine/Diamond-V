@@ -198,7 +198,11 @@ jobs:
 
       - name: Setup Compute Environment
         run: |
-          python3 -m pip install --upgrade pip
+          # Create virtual environment (required for managed Python on GPU runner)
+          python3 -m venv .venv
+          source .venv/bin/activate
+          
+          pip install --upgrade pip
           
           # Install JAX with GPU support (CUDA 12)
           pip install --upgrade "jax[cuda12]" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html || \
@@ -214,6 +218,7 @@ jobs:
           XLA_PYTHON_CLIENT_PREALLOCATE: "false"
           XLA_PYTHON_CLIENT_MEM_FRACTION: "0.8"
         run: |
+          source .venv/bin/activate
           cd genesis-q-mem
           
           DURATION_SEC=$(( ${{ inputs.duration_minutes || 10 }} * 60 ))
