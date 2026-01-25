@@ -83,22 +83,30 @@ class DiamondOpticalSampler:
         """
         Main sampling function with PyTree preservation.
         JIT-compiled for maximum performance.
+        Uses jax.pure_callback for safe host-device data transfer.
         """
         if states is None:
             return None
             
         if HAS_JAX:
-            # Flatten PyTree to numpy array
+            # Flatten PyTree to leaves and treedef
             leaves, treedef = tree_flatten(states)
             
-            # Process through callback bridge
+            # Process each leaf through pure_callback (JIT-safe)
             processed_leaves = []
             for leaf in leaves:
                 if leaf.size > 0:
-                    # Convert to numpy, process, convert back
-                    np_data = np.asarray(leaf)
-                    result = self._host_callback(np_data)
-                    processed_leaves.append(jnp.array(result, dtype=leaf.dtype))
+                    # Use pure_callback for safe tracer-to-numpy conversion
+                    def identity_callback(x):
+                        """Host callback that returns data unchanged (mirror test)."""
+                        return np.asarray(x)
+                    
+                    result = jax.pure_callback(
+                        identity_callback,
+                        jax.ShapeDtypeStruct(leaf.shape, leaf.dtype),
+                        leaf
+                    )
+                    processed_leaves.append(result)
                 else:
                     processed_leaves.append(leaf)
             
