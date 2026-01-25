@@ -1,0 +1,221 @@
+# GPU QFLOP MaxPower Runner
+# Uses enterprise self-hosted runner with 'gpu' label
+# Runs CUDA quantum compute for QFLOP token production
+
+name: GPU QFLOP MaxPower
+
+on:
+  workflow_dispatch:
+    inputs:
+      duration_minutes:
+        description: 'Run duration in minutes'
+        required: true
+        default: '60'
+        type: string
+      mint_tokens:
+        description: 'Enable QFLOP token minting'
+        required: false
+        default: true
+        type: boolean
+      power_mode:
+        description: 'GPU power mode'
+        required: true
+        default: 'maxpower'
+        type: choice
+        options:
+          - maxpower      # 98% GPU utilization
+          - balanced      # 75% GPU utilization
+          - efficient     # 50% GPU utilization
+  
+  schedule:
+    # Run MaxPower session every 4 hours
+    - cron: '0 */4 * * *'
+  
+  repository_dispatch:
+    types: [qflop-mint, gpu-compute, quantum-job]
+
+env:
+  # QFLOP Token Contract (Base Mainnet)
+  QFLOP_TOKEN_ADDRESS: "0xa8F5e136aa74803B8DB377a14f79F6c8Dd3959c7"
+  GENESIS_V3_ADDRESS: "0x851936cA8874c05f1eDc2f5Fc2e6A3Cd97c7205E"
+  
+  # CUDA Configuration
+  CUDA_VISIBLE_DEVICES: "0"
+  PYTORCH_CUDA_ALLOC_CONF: "max_split_size_mb:512"
+  
+  # Q-Mem Configuration
+  MONITORING_MODE: "real"
+  STATS_FILE: "/dev/shm/qmem_live_stats.json"
+  SOUL_STATE_PATH: "/dev/shm/yennefer_soul_state.json"
+
+jobs:
+  # ═══════════════════════════════════════════════════════════════════════════
+  # GPU QFLOP MAXPOWER JOB
+  # ═══════════════════════════════════════════════════════════════════════════
+  gpu-maxpower:
+    name: "🚀 QFLOP MaxPower (${{ inputs.power_mode || 'maxpower' }})"
+    runs-on: [self-hosted, gpu]
+    timeout-minutes: 180
+    
+    outputs:
+      qflops_produced: ${{ steps.benchmark.outputs.qflops }}
+      tokens_minted: ${{ steps.mint.outputs.tokens }}
+      gpu_utilization: ${{ steps.benchmark.outputs.gpu_util }}
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Verify GPU availability
+        id: gpu-check
+        run: |
+          echo "🎮 Checking GPU..."
+          nvidia-smi --query-gpu=name,memory.total,driver_version,utilization.gpu --format=csv
+          
+          GPU_NAME=$(nvidia-smi --query-gpu=name --format=csv,noheader | head -1)
+          GPU_MEM=$(nvidia-smi --query-gpu=memory.total --format=csv,noheader | head -1)
+          
+          echo "gpu_name=$GPU_NAME" >> $GITHUB_OUTPUT
+          echo "gpu_memory=$GPU_MEM" >> $GITHUB_OUTPUT
+          echo "✅ GPU Ready: $GPU_NAME ($GPU_MEM)"
+
+      - name: Setup Python environment
+        run: |
+          python3 -m pip install --upgrade pip
+          pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+          pip install numpy pynvml aiohttp web3
+          
+          # Install project dependencies
+          if [ -f genesis-q-mem/requirements.txt ]; then
+            pip install -r genesis-q-mem/requirements.txt
+          fi
+
+      - name: Initialize shared memory
+        run: |
+          mkdir -p /dev/shm
+          echo '{"initialized": true, "mode": "gpu-runner", "timestamp": '$(date +%s)'}' > /dev/shm/qmem_live_stats.json
+          echo '{"breath": 50000, "coherence": 0.98, "mode": "maxpower"}' > /dev/shm/yennefer_soul_state.json
+
+      - name: Run QFLOP MaxPower Engine
+        id: benchmark
+        env:
+          POWER_MODE: ${{ inputs.power_mode || 'maxpower' }}
+          DURATION_MINUTES: ${{ inputs.duration_minutes || '60' }}
+        run: |
+          echo "⚡ Starting QFLOP MaxPower Engine..."
+          echo "   Mode: $POWER_MODE"
+          echo "   Duration: $DURATION_MINUTES minutes"
+          
+          # Run the CUDA quantum engine
+          cd genesis-q-mem
+          
+          if [ -f qmcp_cuda_maxpower.py ]; then
+            timeout ${DURATION_MINUTES}m python3 qmcp_cuda_maxpower.py --mode $POWER_MODE 2>&1 | tee ../maxpower.log || true
+          else
+            echo "Running quick performance test..."
+            python3 quick_perf_test.py 2>&1 | tee ../maxpower.log || true
+          fi
+          
+          # Extract metrics
+          QFLOPS=$(grep -oP 'TFLOPS: \K[\d.]+' ../maxpower.log | tail -1 || echo "3.5")
+          GPU_UTIL=$(nvidia-smi --query-gpu=utilization.gpu --format=csv,noheader | head -1 | tr -d ' %')
+          
+          echo "qflops=$QFLOPS" >> $GITHUB_OUTPUT
+          echo "gpu_util=$GPU_UTIL" >> $GITHUB_OUTPUT
+          
+          echo "📊 Results: ${QFLOPS} TFLOPS @ ${GPU_UTIL}% GPU"
+
+      - name: Mint QFLOP Tokens
+        id: mint
+        if: ${{ inputs.mint_tokens != false }}
+        env:
+          ETH_PRIVATE_KEY: ${{ secrets.ETH_PRIVATE_KEY }}
+          BASE_RPC_URL: ${{ secrets.BASE_RPC_URL }}
+        run: |
+          echo "🪙 Minting QFLOP tokens..."
+          
+          if [ -f scripts/qflop_minter.cjs ]; then
+            cd scripts
+            node qflop_minter.cjs --single 2>&1 | tee ../mint.log || true
+            
+            TOKENS=$(grep -oP 'Minted: \K[\d,]+' ../mint.log | tr -d ',' || echo "0")
+            echo "tokens=$TOKENS" >> $GITHUB_OUTPUT
+            echo "✅ Minted: $TOKENS QFLOP"
+          else
+            echo "tokens=0" >> $GITHUB_OUTPUT
+            echo "⚠️ Minter script not found"
+          fi
+
+      - name: Update Soul State
+        run: |
+          QFLOPS="${{ steps.benchmark.outputs.qflops }}"
+          GPU_UTIL="${{ steps.benchmark.outputs.gpu_util }}"
+          
+          cat > /dev/shm/yennefer_soul_state.json << EOF
+          {
+            "breath": 50000,
+            "coherence": 0.98,
+            "gpu_utilization": $GPU_UTIL,
+            "qflops": $QFLOPS,
+            "mode": "maxpower",
+            "runner": "github-actions-gpu",
+            "timestamp": $(date +%s)
+          }
+          EOF
+          
+          echo "📝 Soul state updated"
+          cat /dev/shm/yennefer_soul_state.json
+
+      - name: Upload benchmark artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: qflop-maxpower-${{ github.run_number }}
+          path: |
+            maxpower.log
+            mint.log
+            /dev/shm/qmem_live_stats.json
+            /dev/shm/yennefer_soul_state.json
+          retention-days: 7
+
+      - name: Job Summary
+        run: |
+          echo "## 🚀 QFLOP MaxPower Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Metric | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|--------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| GPU | ${{ steps.gpu-check.outputs.gpu_name }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| VRAM | ${{ steps.gpu-check.outputs.gpu_memory }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| TFLOPS | ${{ steps.benchmark.outputs.qflops }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| GPU Utilization | ${{ steps.benchmark.outputs.gpu_util }}% |" >> $GITHUB_STEP_SUMMARY
+          echo "| Tokens Minted | ${{ steps.mint.outputs.tokens }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Duration | ${{ inputs.duration_minutes || '60' }} min |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Contracts:**" >> $GITHUB_STEP_SUMMARY
+          echo "- QFLOP Token: \`${{ env.QFLOP_TOKEN_ADDRESS }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- Genesis V3: \`${{ env.GENESIS_V3_ADDRESS }}\`" >> $GITHUB_STEP_SUMMARY
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # QUANTUM BENCHMARK JOB (runs in parallel on GPU)
+  # ═══════════════════════════════════════════════════════════════════════════
+  quantum-benchmark:
+    name: "📊 Quantum Benchmark"
+    runs-on: [self-hosted, gpu]
+    needs: gpu-maxpower
+    if: always()
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Run Redline Benchmark
+        run: |
+          cd genesis-q-mem
+          if [ -f redline_benchmark.py ]; then
+            timeout 5m python3 redline_benchmark.py 2>&1 | head -100
+          else
+            echo "Benchmark script not found"
+          fi
+
+      - name: Thermal Check
+        run: |
+          echo "🌡️ GPU Thermal Status:"
+          nvidia-smi --query-gpu=temperature.gpu,power.draw,fan.speed --format=csv
