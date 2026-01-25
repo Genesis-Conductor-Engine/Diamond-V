@@ -1,0 +1,133 @@
+name: 🛡️ Process Guardian Monitor
+
+on:
+  # Run every 15 minutes
+  schedule:
+    - cron: '*/15 * * * *'
+  
+  # Manual trigger
+  workflow_dispatch:
+    inputs:
+      force_correction:
+        description: 'Force correction even for warnings'
+        required: false
+        default: 'false'
+        type: boolean
+
+jobs:
+  analyze-and-correct:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 🔍 Analyze Recent Workflow Runs
+        id: analyze
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "## 🛡️ Guardian Analysis Report" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Time:** $(date -u)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Get recent dual-bridge runs
+          RUNS=$(gh run list --workflow qflop-dual-bridge.yml --limit 10 --json databaseId,conclusion,status,createdAt)
+          
+          FAILED=$(echo "$RUNS" | jq '[.[] | select(.conclusion == "failure")] | length')
+          SUCCESS=$(echo "$RUNS" | jq '[.[] | select(.conclusion == "success")] | length')
+          IN_PROGRESS=$(echo "$RUNS" | jq '[.[] | select(.status == "in_progress")] | length')
+          
+          echo "### Dual Bridge Status" >> $GITHUB_STEP_SUMMARY
+          echo "| Metric | Count |" >> $GITHUB_STEP_SUMMARY
+          echo "|--------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| ✅ Success | $SUCCESS |" >> $GITHUB_STEP_SUMMARY
+          echo "| ❌ Failed | $FAILED |" >> $GITHUB_STEP_SUMMARY
+          echo "| ⏳ In Progress | $IN_PROGRESS |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Set outputs
+          echo "failed_count=$FAILED" >> $GITHUB_OUTPUT
+          echo "success_count=$SUCCESS" >> $GITHUB_OUTPUT
+          
+          # Get failed run IDs
+          FAILED_IDS=$(echo "$RUNS" | jq -r '[.[] | select(.conclusion == "failure") | .databaseId] | join(",")')
+          echo "failed_ids=$FAILED_IDS" >> $GITHUB_OUTPUT
+
+      - name: 🔄 Auto-Retry Failed Workflows
+        if: steps.analyze.outputs.failed_count > 0
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "### 🔄 Auto-Corrections" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          IFS=',' read -ra FAILED_IDS <<< "${{ steps.analyze.outputs.failed_ids }}"
+          
+          for RUN_ID in "${FAILED_IDS[@]}"; do
+            if [ -n "$RUN_ID" ]; then
+              echo "Retrying run $RUN_ID..."
+              gh run rerun $RUN_ID --failed 2>/dev/null && \
+                echo "- ✅ Retried run \`$RUN_ID\`" >> $GITHUB_STEP_SUMMARY || \
+                echo "- ⚠️ Could not retry run \`$RUN_ID\`" >> $GITHUB_STEP_SUMMARY
+            fi
+          done
+
+      - name: 🚀 Dispatch Fresh Compute Job
+        if: steps.analyze.outputs.success_count < 3
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 🚀 New Job Dispatch" >> $GITHUB_STEP_SUMMARY
+          
+          gh workflow run qflop-dual-bridge.yml \
+            -f duration_minutes=5 \
+            -f power_mode=maxpower && \
+            echo "- ✅ Dispatched new Dual Bridge job" >> $GITHUB_STEP_SUMMARY || \
+            echo "- ❌ Failed to dispatch job" >> $GITHUB_STEP_SUMMARY
+
+      - name: 📊 Generate Health Report
+        run: |
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📊 System Health" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          SUCCESS=${{ steps.analyze.outputs.success_count }}
+          FAILED=${{ steps.analyze.outputs.failed_count }}
+          TOTAL=$((SUCCESS + FAILED))
+          
+          if [ $TOTAL -gt 0 ]; then
+            RATE=$((SUCCESS * 100 / TOTAL))
+            echo "**Success Rate:** ${RATE}%" >> $GITHUB_STEP_SUMMARY
+            
+            if [ $RATE -lt 50 ]; then
+              echo "⚠️ **WARNING:** Success rate below 50%" >> $GITHUB_STEP_SUMMARY
+            elif [ $RATE -lt 80 ]; then
+              echo "🟡 **NOTICE:** Success rate below 80%" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "✅ **HEALTHY:** System operating normally" >> $GITHUB_STEP_SUMMARY
+            fi
+          fi
+
+  dispatch-if-idle:
+    runs-on: ubuntu-latest
+    needs: analyze-and-correct
+    steps:
+      - name: 🔍 Check Active Runs
+        id: check
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ACTIVE=$(gh run list --workflow qflop-dual-bridge.yml --status in_progress --json databaseId | jq 'length')
+          echo "active_count=$ACTIVE" >> $GITHUB_OUTPUT
+          
+      - name: 🚀 Dispatch If No Active Jobs
+        if: steps.check.outputs.active_count == '0'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "No active jobs, dispatching new compute job..."
+          gh workflow run qflop-dual-bridge.yml \
+            -f duration_minutes=5 \
+            -f power_mode=maxpower

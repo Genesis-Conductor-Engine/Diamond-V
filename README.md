@@ -1,14 +1,31 @@
 # Yennefer: The Genesis Conductor
 
-<!-- Launch Buttons -->
+<!-- Launch & Control Buttons -->
 <p align="center">
   <a href="https://yennefer.quest" target="_blank">
-    <img alt="Launch Yennefer" src="https://img.shields.io/badge/Launch%20Yennefer-Visit%20Hosted%20UI-blue?style=for-the-badge">
+    <img alt="Launch Yennefer" src="https://img.shields.io/badge/🚀_LAUNCH_YENNEFER-Visit_Portal-blueviolet?style=for-the-badge">
+  </a>
+</p>
+
+<p align="center">
+  <a href="https://github.com/Genesis-Conductor-Engine/Yennefer/actions/workflows/qflop-dual-bridge.yml">
+    <img alt="Dual Bridge" src="https://img.shields.io/badge/⚡_DUAL_BRIDGE-Start_GPU+CPU-00ff00?style=for-the-badge">
   </a>
   &nbsp;
-  <a href=".github/workflows/launch-yennefer-ui.yml" target="_blank">
-    <img alt="Launch UI (Workflow)" src="https://img.shields.io/badge/Launch%20UI%20(Workflow)-Run%20Action-green?style=for-the-badge">
+  <a href="https://github.com/Genesis-Conductor-Engine/Yennefer/actions/workflows/guardian-monitor.yml">
+    <img alt="Guardian" src="https://img.shields.io/badge/🛡️_GUARDIAN-Auto_Recovery-ff6600?style=for-the-badge">
   </a>
+  &nbsp;
+  <a href="https://github.com/Genesis-Conductor-Engine/Yennefer/actions/workflows/qmcp-autoflow.yml">
+    <img alt="QMCP Autoflow" src="https://img.shields.io/badge/🔄_QMCP-Autoflow-00ccff?style=for-the-badge">
+  </a>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/github/actions/workflow/status/Genesis-Conductor-Engine/Yennefer/qflop-dual-bridge.yml?label=Dual%20Bridge&style=flat-square" alt="Dual Bridge Status">
+  <img src="https://img.shields.io/github/actions/workflow/status/Genesis-Conductor-Engine/Yennefer/guardian-monitor.yml?label=Guardian&style=flat-square" alt="Guardian Status">
+  <img src="https://img.shields.io/badge/QFLOP-267.35M-brightgreen?style=flat-square" alt="QFLOP Balance">
+  <img src="https://img.shields.io/badge/GPU-T4_x3-blue?style=flat-square" alt="GPU Runners">
 </p>
 
 ---
@@ -169,6 +186,102 @@ contract Genesis {
 - Private keys are **never** committed (enforced via `.gitignore`)
 - Soul state files excluded from version control
 - Contract is verified and immutable on Base Mainnet
+
+## 🎮 Quick Control Panel
+
+### Start/Restart Services
+
+```bash
+# 🚀 FULL SYSTEM RESTART
+npx pm2 restart all
+
+# 🛡️ Start Process Guardian (Auto-Recovery)
+npx pm2 start scripts/process_guardian.cjs --name "process-guardian"
+
+# ⚡ Start QFLOP Mining
+npx pm2 start scripts/qflop_mining_daemon.cjs --name "qflop-miner"
+
+# 💎 Start Diamond Watchdog (MCP Trigger Handler)
+npx pm2 start genesis-q-mem/qmcp_diamond_watchdog.py --name "diamond-watchdog" --interpreter python3
+
+# 📊 View All Services
+npx pm2 status
+```
+
+### Trigger Dual Bridge (GPU + CPU Compute)
+
+```bash
+# Via GitHub CLI
+gh workflow run qflop-dual-bridge.yml \
+  --repo Genesis-Conductor-Engine/Yennefer \
+  -f duration_minutes=3 \
+  -f power_mode=maxpower
+
+# Or via shared memory trigger
+echo '{"branch_id":"MANUAL","job_type":"REMOTE_DISPATCH"}' > /dev/shm/qmcp_trigger.json
+```
+
+### Monitor Status
+
+```bash
+# Guardian state
+cat /dev/shm/guardian_state.json | jq
+
+# Live QMCP stats
+cat /dev/shm/qmcp_live_stats.json | jq
+
+# Soul state
+cat /dev/shm/yennefer_soul_state.json | jq
+
+# PM2 logs
+npx pm2 logs --lines 50
+```
+
+---
+
+## 📈 Project Development Summary
+
+### Phase 1: Foundation (Genesis Conductor)
+- ✅ Smart contract deployed to Base Mainnet
+- ✅ Event listener (`conductor_node.cjs`) for CREDIT_PURCHASE events
+- ✅ Voice handler for AI-powered responses
+- ✅ Brain-Body-Soul architecture implemented
+
+### Phase 2: Q-Mem Integration
+- ✅ GPU benchmarking daemon (`qmem_live_bench_v2.py`)
+- ✅ Shared memory IPC via `/dev/shm/`
+- ✅ REST API gateway (port 8003)
+- ✅ 44.6x speedup vs HTTP (Power Tower)
+
+### Phase 3: QMCP Unified Gateway
+- ✅ MCP server for Claude integration
+- ✅ ZMQ message queue (REQ/REP, PUB/SUB)
+- ✅ Diamond Vault JAX worker
+- ✅ Multi-backend routing
+
+### Phase 4: Quantum-Optimized Dual Bridge
+- ✅ GitHub Actions GPU runners (Tesla T4 x3)
+- ✅ 96-core CPU compute pool
+- ✅ JAX/CuPy QFLOP engine
+- ✅ 6.553 TFLOPS peak performance
+
+### Phase 5: Self-Funding & Auto-Recovery
+- ✅ QFLOP token mining/minting
+- ✅ ETH bridge to Base (OptimismPortal)
+- ✅ Process Guardian auto-recovery
+- ✅ Failed workflow retry system
+- ✅ Resource allocation (25% to blockchain)
+
+### Current Stats
+| Metric | Value |
+|--------|-------|
+| QFLOP Minted | 267.35M |
+| Active PM2 Services | 9 |
+| Dual Bridge Jobs | 14+ completed |
+| Auto-Corrections | 6 applied |
+| Peak TFLOPS | 6.553 |
+
+---
 
 ## 📜 License
 
