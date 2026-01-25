@@ -1,0 +1,98 @@
+# GPU Codespace Launcher Workflow
+# Triggers GPU-enabled Codespace for heavy compute tasks
+
+name: Launch GPU Codespace
+
+on:
+  workflow_dispatch:
+    inputs:
+      machine_type:
+        description: 'Codespace machine type'
+        required: true
+        default: 'largePremiumLinux'
+        type: choice
+        options:
+          - basicLinux          # 2-core, 8GB RAM
+          - standardLinux       # 4-core, 16GB RAM  
+          - largePremiumLinux   # 8-core, 32GB RAM
+          - xLargePremiumLinux  # 16-core, 64GB RAM
+          # GPU options (when available)
+          # - gpu-t4            # NVIDIA T4
+          # - gpu-a100          # NVIDIA A100
+      retention_days:
+        description: 'Keep codespace for N days'
+        required: false
+        default: '7'
+        type: string
+      run_benchmark:
+        description: 'Auto-run Q-Mem benchmark on launch'
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+  codespaces: write
+
+jobs:
+  create-codespace:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Create Codespace
+        id: create
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { data: codespace } = await github.rest.codespaces.createForAuthenticatedUser({
+              repository_id: context.repo.repo,
+              ref: context.ref,
+              machine: '${{ inputs.machine_type }}',
+              devcontainer_path: '.devcontainer/devcontainer.json',
+              retention_period_minutes: ${{ inputs.retention_days }} * 24 * 60,
+              display_name: 'yennefer-gpu-' + new Date().toISOString().slice(0,10)
+            });
+            
+            core.setOutput('codespace_name', codespace.name);
+            core.setOutput('codespace_url', codespace.web_url);
+            core.setOutput('machine', codespace.machine.name);
+            
+            console.log(`✅ Codespace created: ${codespace.name}`);
+            console.log(`🔗 URL: ${codespace.web_url}`);
+            console.log(`💻 Machine: ${codespace.machine.display_name}`);
+
+      - name: Output Codespace Info
+        run: |
+          echo "## 🧬 Yennefer GPU Codespace Created" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Property | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|----------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Name | \`${{ steps.create.outputs.codespace_name }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Machine | ${{ steps.create.outputs.machine }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Retention | ${{ inputs.retention_days }} days |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "🔗 **[Open Codespace](${{ steps.create.outputs.codespace_url }})**" >> $GITHUB_STEP_SUMMARY
+
+  # Optional: Run benchmark after codespace is ready
+  run-benchmark:
+    needs: create-codespace
+    if: ${{ inputs.run_benchmark }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wait for Codespace
+        run: |
+          echo "⏳ Waiting 120s for Codespace to initialize..."
+          sleep 120
+      
+      - name: Trigger Benchmark (via Codespace)
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            // Note: Direct codespace command execution requires additional setup
+            // This is a placeholder for potential Codespace CLI integration
+            console.log('📊 Benchmark would run here via gh codespace ssh');
+            console.log('Manual: gh codespace ssh -c <name> -- "cd genesis-q-mem && ./start_live_bench_v2.sh --mini"');
