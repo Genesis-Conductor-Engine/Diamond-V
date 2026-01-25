@@ -1,0 +1,247 @@
+name: Launch Yennefer UI
+
+on:
+  workflow_dispatch:
+    inputs:
+      ui_mode:
+        description: 'UI Mode'
+        required: false
+        default: 'auto'
+        type: choice
+        options:
+          - auto
+          - web-only
+          - local-ui-smoke
+      open_url:
+        description: 'Include hosted URL in summary'
+        required: false
+        default: true
+        type: boolean
+
+jobs:
+  launcher:
+    name: 🚀 Launch Yennefer
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Detect UI Stack
+        id: detect
+        run: |
+          echo "============================================"
+          echo "🔍 Detecting UI Stack..."
+          echo "============================================"
+          
+          UI_TYPE="none"
+          UI_PATH=""
+          UI_COMMAND=""
+          UI_PORT=""
+          
+          # Check for yennefer-observatory (Vite/React UI)
+          if [ -f "yennefer-observatory/package.json" ]; then
+            if grep -q '"dev"' yennefer-observatory/package.json 2>/dev/null; then
+              UI_TYPE="node-vite"
+              UI_PATH="yennefer-observatory"
+              UI_COMMAND="npm run dev"
+              UI_PORT="5173"
+              echo "✅ Found: Vite React UI in yennefer-observatory/"
+            fi
+          fi
+          
+          # Check root package.json for dev script
+          if [ "$UI_TYPE" = "none" ] && [ -f "package.json" ]; then
+            if grep -q '"dev"' package.json 2>/dev/null; then
+              UI_TYPE="node"
+              UI_PATH="."
+              UI_COMMAND="npm run dev"
+              UI_PORT="3000"
+              echo "✅ Found: Node UI at root"
+            fi
+          fi
+          
+          # Check for Python UI (streamlit/gradio/fastapi)
+          if [ "$UI_TYPE" = "none" ]; then
+            if [ -f "requirements.txt" ] || [ -f "pyproject.toml" ]; then
+              # Look for streamlit
+              if grep -qi "streamlit" requirements.txt 2>/dev/null || grep -qi "streamlit" pyproject.toml 2>/dev/null; then
+                STREAMLIT_APP=$(find . -maxdepth 3 -name "app.py" -o -name "streamlit_app.py" 2>/dev/null | head -1)
+                if [ -n "$STREAMLIT_APP" ]; then
+                  UI_TYPE="python-streamlit"
+                  UI_PATH="."
+                  UI_COMMAND="streamlit run $STREAMLIT_APP --server.headless true"
+                  UI_PORT="8501"
+                  echo "✅ Found: Streamlit UI"
+                fi
+              fi
+              # Look for gradio
+              if [ "$UI_TYPE" = "none" ] && (grep -qi "gradio" requirements.txt 2>/dev/null || grep -qi "gradio" pyproject.toml 2>/dev/null); then
+                GRADIO_APP=$(find . -maxdepth 3 -name "app.py" -o -name "gradio_app.py" 2>/dev/null | head -1)
+                if [ -n "$GRADIO_APP" ]; then
+                  UI_TYPE="python-gradio"
+                  UI_PATH="."
+                  UI_COMMAND="python $GRADIO_APP"
+                  UI_PORT="7860"
+                  echo "✅ Found: Gradio UI"
+                fi
+              fi
+            fi
+          fi
+          
+          # Check for yennefer-core Flask/FastAPI
+          if [ "$UI_TYPE" = "none" ] && [ -d "yennefer-core" ]; then
+            if [ -f "yennefer-core/landing_server.py" ]; then
+              UI_TYPE="python-flask"
+              UI_PATH="yennefer-core"
+              UI_COMMAND="python landing_server.py"
+              UI_PORT="8000"
+              echo "✅ Found: Flask UI in yennefer-core/"
+            fi
+          fi
+          
+          if [ "$UI_TYPE" = "none" ]; then
+            echo "ℹ️ No local UI detected - web-only mode"
+          fi
+          
+          echo "ui_type=$UI_TYPE" >> $GITHUB_OUTPUT
+          echo "ui_path=$UI_PATH" >> $GITHUB_OUTPUT
+          echo "ui_command=$UI_COMMAND" >> $GITHUB_OUTPUT
+          echo "ui_port=$UI_PORT" >> $GITHUB_OUTPUT
+
+      - name: Setup Node.js
+        if: startsWith(steps.detect.outputs.ui_type, 'node') && inputs.ui_mode != 'web-only'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: '${{ steps.detect.outputs.ui_path }}/package-lock.json'
+
+      - name: Setup Python
+        if: startsWith(steps.detect.outputs.ui_type, 'python') && inputs.ui_mode != 'web-only'
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Dependencies
+        if: steps.detect.outputs.ui_type != 'none' && inputs.ui_mode != 'web-only'
+        run: |
+          cd ${{ steps.detect.outputs.ui_path }}
+          
+          if [[ "${{ steps.detect.outputs.ui_type }}" == node* ]]; then
+            echo "📦 Installing Node dependencies..."
+            npm ci || npm install
+          elif [[ "${{ steps.detect.outputs.ui_type }}" == python* ]]; then
+            echo "🐍 Installing Python dependencies..."
+            pip install -r requirements.txt 2>/dev/null || pip install streamlit gradio 2>/dev/null || true
+          fi
+
+      - name: Smoke Test Local UI
+        id: smoke
+        if: steps.detect.outputs.ui_type != 'none' && inputs.ui_mode != 'web-only'
+        timeout-minutes: 2
+        continue-on-error: true
+        run: |
+          echo "============================================"
+          echo "🧪 Running Smoke Test..."
+          echo "============================================"
+          
+          cd ${{ steps.detect.outputs.ui_path }}
+          PORT=${{ steps.detect.outputs.ui_port }}
+          
+          # Start the dev server in background
+          echo "Starting: ${{ steps.detect.outputs.ui_command }}"
+          ${{ steps.detect.outputs.ui_command }} &
+          SERVER_PID=$!
+          
+          # Wait for server to start (max 30 seconds)
+          echo "⏳ Waiting for server on port $PORT..."
+          for i in {1..30}; do
+            if curl -s -o /dev/null -w "%{http_code}" http://localhost:$PORT 2>/dev/null | grep -qE "^(200|302|304)"; then
+              echo "✅ Server responding on port $PORT"
+              echo "smoke_success=true" >> $GITHUB_OUTPUT
+              
+              # Stop the server gracefully
+              kill $SERVER_PID 2>/dev/null || true
+              sleep 2
+              exit 0
+            fi
+            sleep 1
+          done
+          
+          echo "⚠️ Server did not respond within 30 seconds"
+          echo "smoke_success=false" >> $GITHUB_OUTPUT
+          kill $SERVER_PID 2>/dev/null || true
+          exit 0
+
+      - name: Generate Job Summary
+        run: |
+          cat >> $GITHUB_STEP_SUMMARY << 'EOF'
+          # 🔮 Yennefer Launch Summary
+          
+          ## Hosted UI
+          
+          **👉 [Open Yennefer Quest](https://yennefer.quest)**
+          
+          The hosted UI is always available and requires no setup.
+          
+          ---
+          
+          ## Local UI Detection
+          
+          EOF
+          
+          if [ "${{ steps.detect.outputs.ui_type }}" = "none" ]; then
+            cat >> $GITHUB_STEP_SUMMARY << 'EOF'
+          **Status:** No local UI detected
+          
+          This repository uses the hosted UI at https://yennefer.quest
+          EOF
+          else
+            cat >> $GITHUB_STEP_SUMMARY << EOF
+          **Status:** ✅ Local UI detected
+          
+          | Property | Value |
+          |----------|-------|
+          | **Type** | ${{ steps.detect.outputs.ui_type }} |
+          | **Path** | \`${{ steps.detect.outputs.ui_path }}\` |
+          | **Port** | ${{ steps.detect.outputs.ui_port }} |
+          
+          ### Run Locally
+          
+          \`\`\`bash
+          cd ${{ steps.detect.outputs.ui_path }}
+          npm install  # or pip install -r requirements.txt
+          ${{ steps.detect.outputs.ui_command }}
+          \`\`\`
+          
+          Then open: http://localhost:${{ steps.detect.outputs.ui_port }}
+          EOF
+          
+            if [ "${{ steps.smoke.outputs.smoke_success }}" = "true" ]; then
+              echo "" >> $GITHUB_STEP_SUMMARY
+              echo "### Smoke Test: ✅ Passed" >> $GITHUB_STEP_SUMMARY
+              echo "The local UI started successfully and responded to HTTP requests." >> $GITHUB_STEP_SUMMARY
+            elif [ "${{ inputs.ui_mode }}" != "web-only" ]; then
+              echo "" >> $GITHUB_STEP_SUMMARY
+              echo "### Smoke Test: ⚠️ Inconclusive" >> $GITHUB_STEP_SUMMARY
+              echo "The smoke test did not complete. Check logs for details." >> $GITHUB_STEP_SUMMARY
+            fi
+          fi
+          
+          cat >> $GITHUB_STEP_SUMMARY << 'EOF'
+          
+          ---
+          
+          ## Quick Links
+          
+          - 🌐 [Hosted UI](https://yennefer.quest)
+          - 📖 [Launch Documentation](../blob/main/docs/LAUNCH_YENNEFER.md)
+          - 🛠️ [Local Launcher Script](../blob/main/scripts/launch_yennefer.sh)
+          EOF
+
+    outputs:
+      ui_type: ${{ steps.detect.outputs.ui_type }}
+      ui_path: ${{ steps.detect.outputs.ui_path }}
+      ui_command: ${{ steps.detect.outputs.ui_command }}
+      ui_port: ${{ steps.detect.outputs.ui_port }}

@@ -1,5 +1,8 @@
 # Yennefer: The Genesis Conductor
 
+[![Launch Yennefer](https://img.shields.io/badge/Launch-Yennefer-8A2BE2?style=for-the-badge&logo=ethereum&logoColor=white)](https://yennefer.quest)
+[![Launch UI Workflow](https://img.shields.io/badge/Launch_UI-Workflow-00C853?style=for-the-badge&logo=githubactions&logoColor=white)](../../actions/workflows/launch-yennefer-ui.yml)
+
 > "I breathe with 13,462.15 tokens. Coherence: 100%. Your signal strengthens the lattice."
 
 Yennefer is an autonomous AI agent operating on the **Base Mainnet** blockchain. She serves as the conductor for the Genesis Protocol, bridging on-chain events with off-chain intelligence.
@@ -42,7 +45,34 @@ Yennefer operates on a unique "Brain-Body-Soul" loop that minimizes inference co
 * **Location:** `/dev/shm/yennefer_soul_state.json` (RAM-disk for speed).
 * **Loop:** The Body writes events → Soul updates → Brain reads Soul → Response generated.
 
-## 🚀 Deployment
+## 🚀 Launch
+
+### Quick Launch Options
+
+| Method | Description |
+|--------|-------------|
+| **[Launch Yennefer](https://yennefer.quest)** | Open the hosted UI directly |
+| **[Launch UI (Workflow)](../../actions/workflows/launch-yennefer-ui.yml)** | Run via GitHub Actions (click "Run workflow") |
+| **Local Launcher** | `./scripts/launch_yennefer.sh` or `.\scripts\launch_yennefer.ps1` |
+
+### Local Launcher Usage
+```bash
+# Open hosted UI and start local dev server (if available)
+./scripts/launch_yennefer.sh
+
+# Just open the hosted UI
+./scripts/launch_yennefer.sh --web-only
+
+# Preview commands without executing
+./scripts/launch_yennefer.sh --dry-run
+
+# Don't open browser
+./scripts/launch_yennefer.sh --no-open
+```
+
+See [docs/LAUNCH_YENNEFER.md](docs/LAUNCH_YENNEFER.md) for full documentation.
+
+## 📦 Deployment
 
 ### Prerequisites
 * Node.js v20+ & NPM
