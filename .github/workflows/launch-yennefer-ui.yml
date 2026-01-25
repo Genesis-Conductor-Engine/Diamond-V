@@ -114,8 +114,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: '${{ steps.detect.outputs.ui_path }}/package-lock.json'
 
       - name: Setup Python
         if: startsWith(steps.detect.outputs.ui_type, 'python') && inputs.ui_mode != 'web-only'
