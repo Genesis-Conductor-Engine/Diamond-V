@@ -174,8 +174,7 @@ jobs:
   # ═══════════════════════════════════════════════════════════════════════════
   gpu-worker:
     name: "⚡ GPU Worker"
-    runs-on: ubuntu-latest  # Fallback to standard if no GPU available
-    # runs-on: ubuntu-gpu  # Uncomment when GPU runner available
+    runs-on: ubuntu-gpu  # GitHub-hosted NVIDIA T4 GPU runner
     timeout-minutes: 60
     
     outputs:
@@ -200,113 +199,44 @@ jobs:
       - name: Setup Compute Environment
         run: |
           python3 -m pip install --upgrade pip
-          pip install numpy
           
-          # Install PyTorch (CPU version as fallback)
-          pip install torch --index-url https://download.pytorch.org/whl/cpu
+          # Install JAX with GPU support (CUDA 12)
+          pip install --upgrade "jax[cuda12]" -f https://storage.googleapis.com/jax-releases/jax_cuda_releases.html || \
+          pip install jax jaxlib  # Fallback to CPU
+          
+          pip install numpy
 
-      - name: Run GPU/CPU Compute
+      - name: Run Diamond Optical Engine (Overclocked)
         id: compute
         env:
           POWER_MODE: ${{ inputs.power_mode || 'maxpower' }}
-          HAS_GPU: ${{ steps.detect.outputs.has_gpu }}
+          OVERCLOCK_FACTOR: "1.5"
+          XLA_PYTHON_CLIENT_PREALLOCATE: "false"
+          XLA_PYTHON_CLIENT_MEM_FRACTION: "0.8"
         run: |
-          cat > gpu_worker.py << 'WORKER_EOF'
-          import torch
-          import numpy as np
-          import time
-          import json
-          import os
+          cd genesis-q-mem
           
-          class GPUWorker:
-              def __init__(self, power_mode="maxpower"):
-                  self.power_mode = power_mode
-                  self.has_gpu = torch.cuda.is_available()
-                  self.device = "cuda" if self.has_gpu else "cpu"
-                  
-                  # Power mode settings
-                  self.batch_sizes = {
-                      "maxpower": 2048,
-                      "balanced": 1024,
-                      "efficient": 512
-                  }
-                  self.batch_size = self.batch_sizes.get(power_mode, 1024)
-                  
-                  print(f"🔧 GPU Worker initialized")
-                  print(f"   Device: {self.device}")
-                  print(f"   Power Mode: {power_mode}")
-                  print(f"   Batch Size: {self.batch_size}")
-                  
-              def compute_qflops(self, duration_sec=60):
-                  """Run matrix operations to generate QFLOP work"""
-                  print(f"⚡ Starting compute for {duration_sec}s...")
-                  
-                  total_flops = 0
-                  iterations = 0
-                  start_time = time.time()
-                  
-                  while time.time() - start_time < duration_sec:
-                      # Matrix multiplication (2*N^3 FLOPs)
-                      N = self.batch_size
-                      A = torch.randn(N, N, device=self.device)
-                      B = torch.randn(N, N, device=self.device)
-                      C = torch.matmul(A, B)
-                      
-                      # Force sync if GPU
-                      if self.has_gpu:
-                          torch.cuda.synchronize()
-                      
-                      flops = 2 * N * N * N
-                      total_flops += flops
-                      iterations += 1
-                      
-                      if iterations % 100 == 0:
-                          elapsed = time.time() - start_time
-                          tflops = (total_flops / 1e12) / elapsed
-                          print(f"   Iteration {iterations}: {tflops:.2f} TFLOPS")
-                  
-                  elapsed = time.time() - start_time
-                  tflops = (total_flops / 1e12) / elapsed
-                  
-                  return {
-                      "tflops": round(tflops, 3),
-                      "total_flops": total_flops,
-                      "iterations": iterations,
-                      "duration_sec": round(elapsed, 2),
-                      "device": self.device,
-                      "power_mode": self.power_mode
-                  }
+          DURATION_SEC=$(( ${{ inputs.duration_minutes || 10 }} * 60 ))
+          export DURATION_SEC
           
-          if __name__ == "__main__":
-              power_mode = os.environ.get("POWER_MODE", "maxpower")
-              duration = int(os.environ.get("DURATION_SEC", "60"))
-              
-              worker = GPUWorker(power_mode)
-              results = worker.compute_qflops(duration)
-              
-              # Save results
-              os.makedirs("bridge_state", exist_ok=True)
-              with open("bridge_state/gpu_results.json", "w") as f:
-                  json.dump(results, f, indent=2)
-              
-              print(f"\n✅ GPU Worker Complete")
-              print(f"   TFLOPS: {results['tflops']}")
-              print(f"   Iterations: {results['iterations']}")
-              print(f"   Device: {results['device']}")
-              
-              # Output for GitHub Actions
-              with open(os.environ.get("GITHUB_OUTPUT", "/dev/null"), "a") as f:
-                  f.write(f"tflops={results['tflops']}\n")
-          WORKER_EOF
+          if [ -f diamond_optical_engine.py ]; then
+            echo "💎 Running Diamond Optical Engine (Overclocked)..."
+            python3 diamond_optical_engine.py
+          else
+            echo "⚠️ Diamond engine not found, skipping..."
+          fi
           
-          DURATION_SEC=$(( ${{ inputs.duration_minutes || 10 }} * 60 )) \
-          python3 gpu_worker.py
+          # Copy results to bridge_state
+          mkdir -p ../bridge_state
+          cp bridge_state/*.json ../bridge_state/ 2>/dev/null || true
 
       - name: Upload GPU Results
         uses: actions/upload-artifact@v4
         with:
           name: gpu-results-${{ github.run_number }}
-          path: bridge_state/
+          path: |
+            bridge_state/
+            genesis-q-mem/bridge_state/
           retention-days: 1
 
   # ═══════════════════════════════════════════════════════════════════════════
