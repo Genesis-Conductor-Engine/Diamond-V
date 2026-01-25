@@ -54,7 +54,7 @@ jobs:
   # ═══════════════════════════════════════════════════════════════════════════
   gpu-maxpower:
     name: "🚀 QFLOP MaxPower (${{ inputs.power_mode || 'maxpower' }})"
-    runs-on: [self-hosted, gpu]
+    runs-on: ubuntu-latest-m  # 96-core, 384GB RAM larger runner
     timeout-minutes: 180
     
     outputs:
@@ -199,7 +199,7 @@ jobs:
   # ═══════════════════════════════════════════════════════════════════════════
   quantum-benchmark:
     name: "📊 Quantum Benchmark"
-    runs-on: [self-hosted, gpu]
+    runs-on: ubuntu-latest-m  # 96-core, 384GB RAM larger runner
     needs: gpu-maxpower
     if: always()
     
