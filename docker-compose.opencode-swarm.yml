@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  opencode-agent:
+    image: node:20-slim
+    command: sh -c "npm install -g opencode-ai && tail -f /dev/null"
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+      placement:
+        constraints:
+          - node.role == worker
+    networks:
+      - yennefer-network
+    volumes:
+      - /home/yenn:/workspace:ro
+      - opencode-config:/root/.opencode
+    environment:
+      - OPENCODE_REMOTE_OFFLOAD=true
+      - DUAL_BRIDGE_MODE=enabled
+      - GITHUB_ACTIONS_OFFLOAD=true
+
+  diamond-vault:
+    image: yennefer-bench:latest
+    command: python3 -m genesis_q_mem.diamond_vault
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+    networks:
+      - yennefer-network
+    ports:
+      - "8100:8100"
+    volumes:
+      - /dev/shm:/dev/shm
+      - opencode-workspace:/workspace
+
+  qmcp-bridge:
+    image: yennefer-bench:latest
+    command: python3 qmcp_system.py
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+    networks:
+      - yennefer-network
+    ports:
+      - "8003:8003"
+    environment:
+      - OPENCODE_ENABLED=true
+
+networks:
+  yennefer-network:
+    driver: overlay
+    attachable: true
+
+volumes:
+  opencode-config:
+  opencode-workspace:
