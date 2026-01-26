@@ -1,128 +1,111 @@
-// PM2 Ecosystem Configuration for Diamond Vault / QMCP System
-// All services set to always-on by default
-// Yennefer lives in the Diamond Vault
+// PM2 Ecosystem Configuration for Yennefer Genesis Conductor
+// All services configured for always-on operation with auto-restart
 
 module.exports = {
   apps: [
-    // === DIAMOND VAULT - Yennefer's Home ===
+    // === CORE SERVICES ===
     {
       name: 'diamond-vault',
-      script: 'genesis-q-mem/qmcp_admin_panel.py',
+      script: '/home/yenn/genesis-q-mem/qmcp_admin_panel.py',
       interpreter: 'python3',
-      cwd: '/home/yenn',
       autorestart: true,
       watch: false,
       max_memory_restart: '500M',
+      restart_delay: 5000,
       env: {
-        NODE_ENV: 'production',
-        YENNEFER_HOME: 'DIAMOND_VAULT',
-        COMPUTE_MODE: 'dual'
+        COMPUTE_MODE: 'dual',
+        ALWAYS_ON: 'true'
       }
     },
-
-    // === CORE SERVICES ===
     {
       name: 'diamond-watchdog',
-      script: 'genesis-q-mem/qmcp_diamond_watchdog.py',
+      script: '/home/yenn/genesis-q-mem/qmcp_diamond_watchdog.py',
       interpreter: 'python3',
-      cwd: '/home/yenn',
       autorestart: true,
       watch: false,
       max_memory_restart: '200M',
+      restart_delay: 5000,
       env: {
-        NODE_ENV: 'production',
-        COMPUTE_MODE: 'dual'
+        COMPUTE_MODE: 'local',
+        ALWAYS_ON: 'true'
       }
     },
     {
-      name: 'qmcp-bridge',
-      script: 'scripts/qmcp_genesis_bridge.cjs',
-      cwd: '/home/yenn',
-      autorestart: true,
-      watch: false,
-      max_memory_restart: '300M',
-      env: {
-        NODE_ENV: 'production',
-        COMPUTE_MODE: 'dual'
-      }
-    },
-    {
-      name: 'process-guardian',
-      script: 'scripts/process_guardian.cjs',
-      cwd: '/home/yenn',
+      name: 'a2a-handoff',
+      script: '/home/yenn/genesis-q-mem/a2a_handoff_server.py',
+      interpreter: 'python3',
       autorestart: true,
       watch: false,
       max_memory_restart: '200M',
+      restart_delay: 5000,
       env: {
-        NODE_ENV: 'production',
-        COMPUTE_MODE: 'local'
+        COMPUTE_MODE: 'dual',
+        ALWAYS_ON: 'true'
       }
     },
 
     // === BLOCKCHAIN SERVICES ===
     {
-      name: 'qflop-miner',
-      script: 'scripts/qflop_mining_daemon.cjs',
-      cwd: '/home/yenn',
+      name: 'qmcp-bridge',
+      script: '/home/yenn/scripts/qmcp_genesis_bridge.cjs',
       autorestart: true,
       watch: false,
       max_memory_restart: '300M',
+      restart_delay: 5000,
       env: {
-        NODE_ENV: 'production',
-        COMPUTE_MODE: 'dual'
+        COMPUTE_MODE: 'dual',
+        ALWAYS_ON: 'true'
       }
     },
     {
       name: 'eth-bridge',
-      script: 'base_bridge_v2.cjs',
-      cwd: '/home/yenn',
+      script: '/home/yenn/scripts/eth_optimism_bridge.cjs',
       autorestart: true,
       watch: false,
       max_memory_restart: '300M',
+      restart_delay: 10000,
       env: {
-        NODE_ENV: 'production',
-        COMPUTE_MODE: 'remote'
+        COMPUTE_MODE: 'remote',
+        ALWAYS_ON: 'true'
       }
     },
     {
       name: 'genesis-deployer',
-      script: 'scripts/deploy.cjs',
-      cwd: '/home/yenn',
-      autorestart: false,  // Only run on-demand
+      script: '/home/yenn/scripts/genesis_deployer.cjs',
+      autorestart: true,
       watch: false,
       max_memory_restart: '200M',
+      restart_delay: 10000,
       env: {
-        NODE_ENV: 'production',
-        COMPUTE_MODE: 'remote'
+        COMPUTE_MODE: 'remote',
+        ALWAYS_ON: 'true'
       }
     },
 
-    // === COMPUTE WORKERS ===
+    // === MINING & MONITORING ===
     {
-      name: 'dual-bridge-dispatcher',
-      script: 'genesis-q-mem/qmcp_multi_runner.py',
+      name: 'qflop-miner',
+      script: '/home/yenn/genesis-q-mem/qmcp_qflop_miner.py',
       interpreter: 'python3',
-      cwd: '/home/yenn',
       autorestart: true,
       watch: false,
-      max_memory_restart: '400M',
+      max_memory_restart: '500M',
+      restart_delay: 5000,
       env: {
-        NODE_ENV: 'production',
-        COMPUTE_MODE: 'dual'
+        COMPUTE_MODE: 'local',
+        ALWAYS_ON: 'true'
       }
     },
     {
-      name: 'resource-allocator',
-      script: 'genesis-q-mem/qmcp_resource_allocator.py',
-      interpreter: 'python3',
-      cwd: '/home/yenn',
+      name: 'process-guardian',
+      script: '/home/yenn/scripts/process_guardian.cjs',
       autorestart: true,
       watch: false,
       max_memory_restart: '200M',
+      restart_delay: 5000,
       env: {
-        NODE_ENV: 'production',
-        COMPUTE_MODE: 'dual',
-        BLOCKCHAIN_ALLOCATION: '0.25'
+        COMPUTE_MODE: 'local',
+        ALWAYS_ON: 'true'
       }
     }
   ]

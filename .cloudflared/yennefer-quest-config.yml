@@ -1,0 +1,29 @@
+tunnel: ed8b80e3-0634-4933-a722-94d4cae6205c
+credentials-file: /home/yenn/.cloudflared/ed8b80e3-0634-4933-a722-94d4cae6205c.json
+
+ingress:
+  - hostname: yennefer.quest
+    service: http://localhost:8000
+    originRequest:
+      noTLSVerify: true
+  - hostname: vault.yennefer.quest
+    service: http://localhost:8100
+    originRequest:
+      noTLSVerify: true
+  - hostname: api.yennefer.quest
+    service: http://localhost:8088
+    originRequest:
+      noTLSVerify: true
+  - hostname: a2a.yennefer.quest
+    service: http://localhost:8200
+    originRequest:
+      noTLSVerify: true
+  - hostname: vault.genesisconductor.io
+    service: http://localhost:8100
+    originRequest:
+      noTLSVerify: true
+  - hostname: a2a.genesisconductor.io
+    service: http://localhost:8200
+    originRequest:
+      noTLSVerify: true
+  - service: http_status:404
