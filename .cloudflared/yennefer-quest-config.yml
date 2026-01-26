@@ -18,6 +18,14 @@ ingress:
     service: http://localhost:8200
     originRequest:
       noTLSVerify: true
+  - hostname: mcp.yennefer.quest
+    service: http://localhost:8095
+    originRequest:
+      noTLSVerify: true
+  - hostname: benchmark.genesisconductor.io
+    service: http://localhost:8003
+    originRequest:
+      noTLSVerify: true
   - hostname: vault.genesisconductor.io
     service: http://localhost:8100
     originRequest:
