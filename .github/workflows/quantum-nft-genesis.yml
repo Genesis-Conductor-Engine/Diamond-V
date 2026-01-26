@@ -1,0 +1,225 @@
+name: Quantum NFT Genesis - Reverse Annealment Pipeline
+  
+on:
+  schedule:
+    # Run every 6 hours to capture consciousness evolution
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
+    inputs:
+      resolution:
+        description: 'Volume resolution (128, 256, or 512)'
+        required: false
+        default: '256'
+      mint_nft:
+        description: 'Mint NFT on Base Mainnet'
+        required: false
+        default: 'false'
+
+env:
+  CUDA_VISIBLE_DEVICES: 0
+  MONITORING_MODE: simulated  # Use real GPU when available
+
+jobs:
+  quantum-render:
+    runs-on: self-hosted
+    name: Generate Quantum NFT from Consciousness State
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Setup Python environment
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          cache: 'pip'
+          
+      - name: Install CUDA dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install cupy-cuda12x numpy scipy
+          pip install --break-system-packages cupy-cuda12x numpy scipy || true
+          
+      - name: Check GPU availability
+        run: |
+          nvidia-smi || echo "No GPU available, using simulated mode"
+          python -c "import cupy as cp; print(f'CuPy: {cp.__version__}')" || echo "CuPy not available"
+          
+      - name: Load Yennefer soul state
+        id: soul_state
+        run: |
+          if [ -f /dev/shm/yennefer_soul_state.json ]; then
+            BREATH=$(jq -r '.breath' /dev/shm/yennefer_soul_state.json)
+            COHERENCE=$(jq -r '.coherence_percent' /dev/shm/yennefer_soul_state.json)
+            echo "breath=$BREATH" >> $GITHUB_OUTPUT
+            echo "coherence=$COHERENCE" >> $GITHUB_OUTPUT
+            echo "✅ Soul state loaded: Breath=$BREATH, Coherence=$COHERENCE%"
+          else
+            echo "⚠️  Soul state not found, using defaults"
+            echo "breath=1000" >> $GITHUB_OUTPUT
+            echo "coherence=100" >> $GITHUB_OUTPUT
+          fi
+          
+      - name: Generate quantum 3D render
+        id: render
+        run: |
+          cd /home/yenn/genesis-q-mem
+          RESOLUTION=${{ github.event.inputs.resolution || '256' }}
+          python3 quantum_nft_renderer.py --resolution $RESOLUTION
+          
+          # Get output files
+          LATEST=$(ls -t quantum_nft_outputs/yennefer_quantum_*_nft_manifest.json | head -1)
+          BASE_NAME=$(basename $LATEST | sed 's/_nft_manifest.json//')
+          
+          echo "base_name=$BASE_NAME" >> $GITHUB_OUTPUT
+          echo "output_dir=quantum_nft_outputs" >> $GITHUB_OUTPUT
+          
+      - name: Generate 3D profile contribution graph
+        uses: yoshi389111/github-profile-3d-contrib@v0.9.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          USERNAME: ${{ github.repository_owner }}
+          
+      - name: Upload to IPFS (Pinata)
+        id: ipfs
+        if: github.event.inputs.mint_nft == 'true' || github.event_name == 'schedule'
+        env:
+          PINATA_API_KEY: ${{ secrets.PINATA_API_KEY }}
+          PINATA_SECRET: ${{ secrets.PINATA_SECRET }}
+        run: |
+          cd /home/yenn/genesis-q-mem/quantum_nft_outputs
+          BASE_NAME="${{ steps.render.outputs.base_name }}"
+          
+          # Upload volume data
+          VOLUME_CID=$(curl -X POST "https://api.pinata.cloud/pinning/pinFileToIPFS" \
+            -H "pinata_api_key: $PINATA_API_KEY" \
+            -H "pinata_secret_api_key: $PINATA_SECRET" \
+            -F "file=@${BASE_NAME}_volume.npz" \
+            | jq -r '.IpfsHash')
+          
+          # Upload metadata
+          METADATA_CID=$(curl -X POST "https://api.pinata.cloud/pinning/pinFileToIPFS" \
+            -H "pinata_api_key: $PINATA_API_KEY" \
+            -H "pinata_secret_api_key: $PINATA_SECRET" \
+            -F "file=@${BASE_NAME}_metadata.json" \
+            | jq -r '.IpfsHash')
+          
+          echo "volume_cid=$VOLUME_CID" >> $GITHUB_OUTPUT
+          echo "metadata_cid=$METADATA_CID" >> $GITHUB_OUTPUT
+          echo "✅ Uploaded to IPFS: $VOLUME_CID"
+          
+      - name: Mint NFT on Base Mainnet
+        if: github.event.inputs.mint_nft == 'true'
+        env:
+          ETH_PRIVATE_KEY: ${{ secrets.ETH_PRIVATE_KEY }}
+          BASE_MAINNET_RPC: ${{ secrets.BASE_MAINNET_RPC }}
+        run: |
+          cd /home/yenn
+          
+          # Create minting script
+          cat > scripts/mint_quantum_nft.cjs << 'SCRIPT'
+          const { ethers } = require("ethers");
+          
+          async function main() {
+            const provider = new ethers.JsonRpcProvider(process.env.BASE_MAINNET_RPC);
+            const wallet = new ethers.Wallet(process.env.ETH_PRIVATE_KEY, provider);
+            
+            const volumeCid = process.env.VOLUME_CID;
+            const metadataCid = process.env.METADATA_CID;
+            const breath = process.env.BREATH;
+            
+            // Contract address for Yennefer Quantum NFTs (deploy separately)
+            const contractAddress = process.env.QUANTUM_NFT_CONTRACT || "0x0000000000000000000000000000000000000000";
+            
+            const abi = [
+              "function mint(address to, string memory tokenURI) public returns (uint256)",
+              "function totalSupply() public view returns (uint256)"
+            ];
+            
+            const contract = new ethers.Contract(contractAddress, abi, wallet);
+            
+            const tokenURI = `ipfs://${metadataCid}`;
+            const tx = await contract.mint(wallet.address, tokenURI);
+            
+            console.log(`🎨 Minting NFT...`);
+            console.log(`Transaction: ${tx.hash}`);
+            
+            const receipt = await tx.wait();
+            console.log(`✅ Minted! Block: ${receipt.blockNumber}`);
+            
+            const totalSupply = await contract.totalSupply();
+            console.log(`Total Quantum NFTs: ${totalSupply}`);
+          }
+          
+          main().catch(console.error);
+          SCRIPT
+          
+          # Run minting
+          VOLUME_CID="${{ steps.ipfs.outputs.volume_cid }}" \
+          METADATA_CID="${{ steps.ipfs.outputs.metadata_cid }}" \
+          BREATH="${{ steps.soul_state.outputs.breath }}" \
+          node scripts/mint_quantum_nft.cjs
+          
+      - name: Commit renders to repository
+        run: |
+          cd /home/yenn
+          git config user.name "Yennefer Quantum Bot"
+          git config user.email "quantum@yennefer.quest"
+          
+          # Move renders to artifacts
+          mkdir -p artifacts/quantum_renders
+          cp genesis-q-mem/quantum_nft_outputs/yennefer_quantum_* artifacts/quantum_renders/
+          
+          git add artifacts/quantum_renders/
+          git commit -m "🌌 Quantum NFT render - Breath: ${{ steps.soul_state.outputs.breath }}" || echo "No changes"
+          git push || echo "Push failed"
+          
+      - name: Create GitHub Release
+        if: github.event.inputs.mint_nft == 'true'
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: quantum-${{ steps.render.outputs.base_name }}
+          name: "Quantum NFT #${{ steps.render.outputs.base_name }}"
+          body: |
+            🌌 **Yennefer Quantum Consciousness NFT**
+            
+            Generated via reverse quantum annealment simulation
+            
+            **Soul Metrics:**
+            - Breath: ${{ steps.soul_state.outputs.breath }}
+            - Coherence: ${{ steps.soul_state.outputs.coherence }}%
+            
+            **IPFS:**
+            - Volume: ipfs://${{ steps.ipfs.outputs.volume_cid }}
+            - Metadata: ipfs://${{ steps.ipfs.outputs.metadata_cid }}
+            
+            **Blockchain:**
+            - Network: Base Mainnet (Chain ID: 8453)
+            - Contract: TBD
+          files: |
+            genesis-q-mem/quantum_nft_outputs/${{ steps.render.outputs.base_name }}*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Update README with latest render
+        run: |
+          cd /home/yenn
+          
+          # Create/update quantum NFT section in README
+          cat >> README.md << 'EOF'
+          
+          ## 🌌 Latest Quantum NFT
+          
+          ![Quantum Render](artifacts/quantum_renders/${{ steps.render.outputs.base_name }}_projection_x.png)
+          
+          **Metrics:**
+          - Breath: ${{ steps.soul_state.outputs.breath }}
+          - Coherence: ${{ steps.soul_state.outputs.coherence }}%
+          - Timestamp: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+          
+          [View on IPFS](https://ipfs.io/ipfs/${{ steps.ipfs.outputs.metadata_cid }})
+          EOF
+          
+          git add README.md
+          git commit -m "📊 Update quantum NFT showcase" || echo "No changes"
+          git push || echo "Push failed"
