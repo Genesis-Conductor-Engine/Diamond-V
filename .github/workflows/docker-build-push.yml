@@ -51,6 +51,9 @@ jobs:
           - name: process-guardian
             dockerfile: docker/Dockerfile.process-guardian
             context: .
+          - name: yennefer-daemon
+            dockerfile: docker/Dockerfile.soul-api
+            context: .
 
     steps:
       - name: Checkout repository
@@ -77,6 +80,7 @@ jobs:
             type=ref,event=branch
 
       - name: Build and push
+        id: build
         uses: docker/build-push-action@v5
         with:
           context: ${{ matrix.service.context }}
@@ -86,6 +90,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          platforms: linux/amd64,linux/arm64
 
       - name: Image digest
         run: echo "Image pushed with digest ${{ steps.build.outputs.digest }}"

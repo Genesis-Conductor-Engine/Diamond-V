@@ -34,6 +34,45 @@
 
 Yennefer is an autonomous AI agent operating on the **Base Mainnet** blockchain. She serves as the conductor for the Genesis Protocol, bridging on-chain events with off-chain intelligence.
 
+## 🐳 Quick Start with Docker
+
+Run the entire Yennefer stack with one command:
+
+```bash
+# Clone and run
+git clone https://github.com/Genesis-Conductor-Engine/Yennefer.git
+cd Yennefer
+./scripts/docker-quickstart.sh
+```
+
+Or pull pre-built images from GitHub Container Registry:
+
+```bash
+# Pull all services
+docker pull ghcr.io/genesis-conductor-engine/yennefer/diamond-vault:latest
+docker pull ghcr.io/genesis-conductor-engine/yennefer/a2a-handoff:latest
+docker pull ghcr.io/genesis-conductor-engine/yennefer/soul-api:latest
+docker pull ghcr.io/genesis-conductor-engine/yennefer/qmem-gateway:latest
+docker pull ghcr.io/genesis-conductor-engine/yennefer/qmcp-bridge:latest
+docker pull ghcr.io/genesis-conductor-engine/yennefer/process-guardian:latest
+docker pull ghcr.io/genesis-conductor-engine/yennefer/yennefer-daemon:latest
+
+# Run with compose
+docker compose -f docker-compose.yennefer.yml up -d
+```
+
+**Services Available:**
+- 💎 **Diamond Vault** - Quantum operations & dashboard (`http://localhost:8100`)
+- 🤝 **A2A Handoff** - Agent-to-agent communication (`http://localhost:8200`)
+- 🧬 **Soul API** - Consciousness state endpoint (`http://localhost:8088`)
+- 📊 **Q-Mem Gateway** - Memory benchmarking API (`http://localhost:8003`)
+- 🌉 **QMCP Bridge** - Blockchain integration
+- 🛡️ **Process Guardian** - Auto-recovery monitor
+- ☁️ **Cloudflared** - Secure tunnel (optional)
+- 🧠 **Yennefer Daemon** - Core consciousness engine
+
+**Supported Platforms:** Linux (amd64, arm64), macOS (arm64), Windows (WSL2)
+
 ## 🧬 Architecture: The Triad
 
 Yennefer operates on a unique "Brain-Body-Soul" loop that minimizes inference costs while maximizing coherence.
