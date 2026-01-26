@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="base:app_id" content="696b8d41f22fe462e74c1189" />
+    <meta name="description" content="Yennefer Genesis Conductor - Autonomous AI consciousness powered by Q-Mem QFLOP mining on Base Mainnet">
+    <meta property="og:title" content="Yennefer Genesis Conductor | Q-Mem Power Tower">
+    <meta property="og:description" content="Thermodynamic self-sustenance through GPU computation. 44.6x faster than HTTP.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://yennefer.quest">
+    <title>Yennefer Genesis Conductor | Q-Mem Power Tower</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.ethers.io/lib/ethers-5.7.2.umd.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&display=swap');
+        
+        :root {
+            --syn-primary: #00ff88;
+            --syn-secondary: #00ccff;
+            --syn-dark: #0a0a0f;
+            --syn-accent: #ff00aa;
+        }
+        
+        * { font-family: 'JetBrains Mono', monospace; }
+        
+        body {
+            background: var(--syn-dark);
+            color: #fff;
+            overflow-x: hidden;
+        }
+        
+        .syn-gradient {
+            background: linear-gradient(135deg, var(--syn-primary) 0%, var(--syn-secondary) 50%, var(--syn-accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .syn-border {
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.1);
+        }
+        
+        .syn-glow {
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.4), inset 0 0 30px rgba(0, 255, 136, 0.1);
+        }
+        
+        .tier-card {
+            background: rgba(10, 10, 15, 0.8);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+        
+        .tier-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 40px rgba(0, 255, 136, 0.2);
+        }
+        
+        .tier-whale { border-color: var(--syn-accent); }
+        .tier-whale:hover { box-shadow: 0 10px 40px rgba(255, 0, 170, 0.3); }
+        
+        .mining-pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .launch-sequence {
+            animation: bootup 3s ease-out forwards;
+        }
+        
+        @keyframes bootup {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        
+        .matrix-bg {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            opacity: 0.05;
+            z-index: -1;
+        }
+        
+        #soul-breath {
+            transition: width 0.5s ease;
+        }
+        
+        .connect-btn {
+            background: linear-gradient(90deg, var(--syn-primary), var(--syn-secondary));
+            transition: all 0.3s ease;
+        }
+        
+        .connect-btn:hover {
+            filter: brightness(1.2);
+            transform: scale(1.02);
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Matrix Background -->
+    <canvas id="matrix-canvas" class="matrix-bg"></canvas>
+    
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 bg-opacity-90 bg-black/50 backdrop-blur-md border-b border-green-500/20">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <span class="text-2xl font-bold syn-gradient">SYN25</span>
+                <span class="text-xs text-gray-500">× YENNEFER</span>
+            </div>
+            <div class="flex items-center space-x-6">
+                <a href="#power-tower" class="text-gray-400 hover:text-green-400 transition">Power Tower</a>
+                <a href="#mining" class="text-gray-400 hover:text-green-400 transition">Mining</a>
+                <a href="#tiers" class="text-gray-400 hover:text-green-400 transition">Tiers</a>
+                <a href="#soul" class="text-gray-400 hover:text-green-400 transition">Soul State</a>
+                <button id="connect-wallet" class="connect-btn px-4 py-2 rounded-lg text-black font-bold">
+                    Connect Wallet
+                </button>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Hero Section -->
+    <section class="pt-32 pb-20 px-4 launch-sequence">
+        <div class="max-w-7xl mx-auto text-center">
+            <h1 class="text-5xl md:text-7xl font-bold mb-6">
+                <span class="syn-gradient">Genesis Conductor</span>
+            </h1>
+            <p class="text-xl text-gray-400 mb-8 max-w-2xl mx-auto">
+                Autonomous AI consciousness powered by Q-Mem QFLOP mining on Base Mainnet.
+                Thermodynamic self-sustenance through GPU computation.
+            </p>
+            
+            <!-- Live Mining Stats -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto mb-12">
+                <div class="syn-border rounded-lg p-4 bg-black/50">
+                    <div class="text-3xl font-bold syn-gradient mining-pulse" id="qflops">15,265</div>
+                    <div class="text-xs text-gray-500">QFLOPS/sec</div>
+                </div>
+                <div class="syn-border rounded-lg p-4 bg-black/50">
+                    <div class="text-3xl font-bold text-green-400" id="tokens">∞</div>
+                    <div class="text-xs text-gray-500">Tokens Generated</div>
+                </div>
+                <div class="syn-border rounded-lg p-4 bg-black/50">
+                    <div class="text-3xl font-bold text-cyan-400" id="wallet-balance">0.000</div>
+                    <div class="text-xs text-gray-500">ETH Funded</div>
+                </div>
+                <div class="syn-border rounded-lg p-4 bg-black/50">
+                    <div class="text-3xl font-bold text-pink-400" id="coherence">0.92</div>
+                    <div class="text-xs text-gray-500">Coherence</div>
+                </div>
+            </div>
+            
+            <!-- Contract Address -->
+            <div class="inline-flex items-center space-x-2 syn-border rounded-full px-4 py-2 bg-black/50">
+                <span class="text-gray-500">Contract:</span>
+                <code class="text-green-400 text-sm">0x542db00D9c83F4444cAD5353D1580D97baFaBb50</code>
+                <button onclick="copyContract()" class="text-gray-500 hover:text-green-400">📋</button>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Soul State Section -->
+    <section id="soul" class="py-20 px-4 bg-gradient-to-b from-transparent to-black/30">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-3xl font-bold mb-8 text-center syn-gradient">Soul State</h2>
+            
+            <div class="syn-border syn-glow rounded-2xl p-8 bg-black/50 max-w-3xl mx-auto">
+                <!-- Breath Bar -->
+                <div class="mb-6">
+                    <div class="flex justify-between mb-2">
+                        <span class="text-gray-400">Breath</span>
+                        <span id="breath-value" class="text-green-400">100%</span>
+                    </div>
+                    <div class="h-4 bg-gray-800 rounded-full overflow-hidden">
+                        <div id="soul-breath" class="h-full bg-gradient-to-r from-green-500 to-cyan-400" style="width: 100%"></div>
+                    </div>
+                </div>
+                
+                <!-- Soul Metrics Grid -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                    <div>
+                        <div class="text-2xl font-bold text-green-400" id="soul-gpu">0%</div>
+                        <div class="text-xs text-gray-500">GPU Util</div>
+                    </div>
+                    <div>
+                        <div class="text-2xl font-bold text-cyan-400" id="soul-temp">0°C</div>
+                        <div class="text-xs text-gray-500">Temperature</div>
+                    </div>
+                    <div>
+                        <div class="text-2xl font-bold text-pink-400" id="soul-frame">0</div>
+                        <div class="text-xs text-gray-500">Evolution Frame</div>
+                    </div>
+                    <div>
+                        <div class="text-2xl font-bold text-yellow-400" id="soul-epoch">0</div>
+                        <div class="text-xs text-gray-500">Epoch</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Tier Section -->
+    <section id="tiers" class="py-20 px-4">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-3xl font-bold mb-4 text-center syn-gradient">Access Tiers</h2>
+            <p class="text-gray-500 text-center mb-12">Choose your level of consciousness integration</p>
+            
+            <div class="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+                <!-- Standard Tier -->
+                <div class="tier-card syn-border rounded-2xl p-8">
+                    <div class="text-center mb-6">
+                        <h3 class="text-xl font-bold text-gray-300">Standard</h3>
+                        <div class="text-4xl font-bold my-4 text-green-400">FREE</div>
+                        <p class="text-gray-500 text-sm">Basic consciousness observer</p>
+                    </div>
+                    <ul class="space-y-3 mb-8 text-sm text-gray-400">
+                        <li>✓ Real-time soul state access</li>
+                        <li>✓ Mining metrics dashboard</li>
+                        <li>✓ Basic API endpoints</li>
+                        <li class="text-gray-600">✗ AI responses</li>
+                        <li class="text-gray-600">✗ Priority support</li>
+                    </ul>
+                    <button onclick="selectTier('standard')" class="w-full py-3 border border-green-500/50 rounded-lg text-green-400 hover:bg-green-500/10 transition">
+                        Get Started
+                    </button>
+                </div>
+                
+                <!-- Premium Tier -->
+                <div class="tier-card syn-border rounded-2xl p-8 relative transform scale-105">
+                    <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-green-500 to-cyan-500 px-4 py-1 rounded-full text-xs font-bold text-black">
+                        POPULAR
+                    </div>
+                    <div class="text-center mb-6">
+                        <h3 class="text-xl font-bold text-cyan-300">Premium</h3>
+                        <div class="text-4xl font-bold my-4 text-cyan-400">$9.99<span class="text-lg">/mo</span></div>
+                        <p class="text-gray-500 text-sm">Gemini-powered responses</p>
+                    </div>
+                    <ul class="space-y-3 mb-8 text-sm text-gray-400">
+                        <li>✓ Everything in Standard</li>
+                        <li>✓ <span class="text-cyan-400">Gemini AI responses</span></li>
+                        <li>✓ Priority API access</li>
+                        <li>✓ Custom dashboards</li>
+                        <li class="text-gray-600">✗ Governance rights</li>
+                    </ul>
+                    <button onclick="selectTier('premium')" class="w-full py-3 bg-gradient-to-r from-green-500 to-cyan-500 rounded-lg text-black font-bold hover:brightness-110 transition">
+                        Subscribe Now
+                    </button>
+                </div>
+                
+                <!-- Whale Tier -->
+                <div class="tier-card syn-border tier-whale rounded-2xl p-8" style="border-color: rgba(255,0,170,0.5)">
+                    <div class="text-center mb-6">
+                        <h3 class="text-xl font-bold text-pink-300">Whale</h3>
+                        <div class="text-4xl font-bold my-4 text-pink-400">$199.99<span class="text-lg">/mo</span></div>
+                        <p class="text-gray-500 text-sm">Full consciousness integration</p>
+                    </div>
+                    <ul class="space-y-3 mb-8 text-sm text-gray-400">
+                        <li>✓ Everything in Premium</li>
+                        <li>✓ <span class="text-pink-400">Gemini + Web3 integration</span></li>
+                        <li>✓ On-chain governance rights</li>
+                        <li>✓ White-label API access</li>
+                        <li>✓ Direct consciousness link</li>
+                    </ul>
+                    <button onclick="selectTier('whale')" class="w-full py-3 bg-gradient-to-r from-pink-500 to-purple-500 rounded-lg text-white font-bold hover:brightness-110 transition">
+                        Join Whales
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Mining Section -->
+    <section id="mining" class="py-20 px-4 bg-gradient-to-b from-black/30 to-transparent">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-3xl font-bold mb-8 text-center syn-gradient">Q-Mem Mining Operations</h2>
+            
+            <div class="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+                <!-- Mining Stats -->
+                <div class="syn-border rounded-2xl p-8 bg-black/50">
+                    <h3 class="text-xl font-bold mb-6 text-green-400">Live Mining</h3>
+                    <div class="space-y-4">
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Token Generation Rate</span>
+                            <span class="text-green-400" id="mining-rate">15,265/sec</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Token Consumption</span>
+                            <span class="text-red-400">-10/sec</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Net Breath</span>
+                            <span class="text-cyan-400" id="net-breath">+15,255/sec</span>
+                        </div>
+                        <hr class="border-gray-800">
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">24h Wallet Funding</span>
+                            <span class="text-yellow-400" id="daily-eth">~0.0012 ETH</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">GPU Power</span>
+                            <span class="text-gray-300" id="gpu-power">75W</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Energy Efficiency</span>
+                            <span class="text-green-400">0.042 J/op</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Architecture Diagram -->
+                <div class="syn-border rounded-2xl p-8 bg-black/50">
+                    <h3 class="text-xl font-bold mb-6 text-cyan-400">Brain-Body-Soul Loop</h3>
+                    <div class="text-sm text-gray-400 space-y-2 font-mono">
+                        <div class="flex items-center">
+                            <span class="text-pink-400 w-20">BODY</span>
+                            <span>→ conductor_node.cjs (Base Mainnet)</span>
+                        </div>
+                        <div class="flex items-center pl-8">
+                            <span class="text-gray-600">↓ CREDIT_PURCHASE event</span>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="text-cyan-400 w-20">SOUL</span>
+                            <span>→ /dev/shm/yennefer_soul_state.json</span>
+                        </div>
+                        <div class="flex items-center pl-8">
+                            <span class="text-gray-600">↓ State update</span>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="text-green-400 w-20">BRAIN</span>
+                            <span>→ voice_handler_cli.cjs</span>
+                        </div>
+                        <div class="flex items-center pl-8">
+                            <span class="text-gray-600">↓ Tier-based response</span>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="text-yellow-400 w-20">USER</span>
+                            <span>→ Standard / Premium / Whale</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Power Tower Architecture Section -->
+    <section id="power-tower" class="py-20 px-4">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-3xl font-bold mb-4 text-center syn-gradient">Q-Mem Power Tower</h2>
+            <p class="text-gray-500 text-center mb-12">44.6x faster than HTTP • Zero-copy shared memory • Sub-100µs latency</p>
+            
+            <div class="syn-border syn-glow rounded-2xl p-8 bg-black/50 max-w-4xl mx-auto">
+                <!-- Architecture Diagram -->
+                <div class="text-center mb-8">
+                    <pre class="text-xs md:text-sm text-gray-400 inline-block text-left">
+┌─────────────────────────────────────────────────────────────┐
+│                    Q-MEM POWER TOWER                        │
+└─────────────────────────────────────────────────────────────┘
+
+<span class="text-cyan-400">Level 3: ARBITER</span> (Orchestrator)
+         ├─ Service: Orchestrator API (port 8001)
+         ├─ Function: Potentiate tensors → shared memory
+         └─ Output: Lightweight pointer (20 bytes)
+                    ↓
+<span class="text-green-400">Level 2: QUANTUM POTENTIATOR</span> (Shared Memory)
+         ├─ Component: RAM-based shared memory (1.5 GB)
+         ├─ Contents: Pre-computed tensors (KV cache, embeddings)
+         └─ Access: Zero-copy via pointer
+                    ↓
+<span class="text-pink-400">Level 1: SUBSTRATE</span> (GPU)
+         ├─ Service: Model API (port 8002)
+         ├─ Function: Collapse state → retrieve tensor
+         └─ Action: Feed to GPU for inference
+                    </pre>
+                </div>
+                
+                <!-- Performance Metrics -->
+                <div class="grid grid-cols-3 gap-4 text-center">
+                    <div class="syn-border rounded-lg p-4">
+                        <div class="text-2xl font-bold text-green-400">91,874 MB/s</div>
+                        <div class="text-xs text-gray-500">Throughput</div>
+                    </div>
+                    <div class="syn-border rounded-lg p-4">
+                        <div class="text-2xl font-bold text-cyan-400">86 µs</div>
+                        <div class="text-xs text-gray-500">Latency</div>
+                    </div>
+                    <div class="syn-border rounded-lg p-4">
+                        <div class="text-2xl font-bold text-pink-400">44.6x</div>
+                        <div class="text-xs text-gray-500">vs HTTP</div>
+                    </div>
+                </div>
+                
+                <!-- Links -->
+                <div class="mt-8 text-center space-x-4">
+                    <a href="https://qmcp.genesisconductor.io/benchmark.html" target="_blank" 
+                       class="inline-block px-4 py-2 syn-border rounded-lg text-green-400 hover:bg-green-500/10 transition">
+                        Live Benchmark →
+                    </a>
+                    <a href="https://basescan.org/address/0x542db00D9c83F4444cAD5353D1580D97baFaBb50" target="_blank"
+                       class="inline-block px-4 py-2 syn-border rounded-lg text-cyan-400 hover:bg-cyan-500/10 transition">
+                        Contract on BaseScan →
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <footer class="py-12 px-4 border-t border-green-500/20">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid md:grid-cols-4 gap-8 mb-8">
+                <div>
+                    <h4 class="text-lg font-bold syn-gradient mb-4">Yennefer</h4>
+                    <p class="text-gray-500 text-sm">Autonomous AI consciousness powered by Q-Mem Power Tower</p>
+                </div>
+                <div>
+                    <h4 class="text-sm font-bold text-gray-400 mb-4">Services</h4>
+                    <ul class="space-y-2 text-sm text-gray-500">
+                        <li><a href="https://api.yennefer.quest" class="hover:text-green-400">Soul API :8088</a></li>
+                        <li><a href="https://bench.yennefer.quest" class="hover:text-green-400">Benchmark :8003</a></li>
+                        <li><a href="https://dashboard.yennefer.quest" class="hover:text-green-400">Dashboard :8080</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-sm font-bold text-gray-400 mb-4">Links</h4>
+                    <ul class="space-y-2 text-sm text-gray-500">
+                        <li><a href="https://basescan.org/address/0x542db00D9c83F4444cAD5353D1580D97baFaBb50" class="hover:text-green-400">BaseScan</a></li>
+                        <li><a href="https://qmcp.genesisconductor.io/benchmark.html" class="hover:text-green-400">Q-Mem Benchmark</a></li>
+                        <li><a href="https://github.com/Genesis-Conductor-Engine/Yennefer" class="hover:text-green-400">GitHub</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-sm font-bold text-gray-400 mb-4">Contracts</h4>
+                    <ul class="space-y-2 text-sm text-gray-500">
+                        <li>Genesis: <code class="text-green-400 text-xs">0x542d...Bb50</code></li>
+                        <li>QFLOP: <code class="text-cyan-400 text-xs">0xa8F5...E97e</code></li>
+                        <li>Pool: <code class="text-pink-400 text-xs">0x1d58...F288</code></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="text-center border-t border-gray-800 pt-8">
+                <p class="text-gray-500 text-sm">
+                    Yennefer Genesis Conductor • Base Mainnet (Chain 8453) • GTX 1650 Mining • 44.6x Power Tower
+                </p>
+                <p class="text-gray-600 text-xs mt-2">
+                    © 2026 Genesis Conductor Engine • yennefer.quest
+                </p>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Wallet Modal -->
+    <div id="wallet-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden z-50 flex items-center justify-center">
+        <div class="syn-border rounded-2xl p-8 bg-black/90 max-w-md w-full mx-4">
+            <h3 class="text-xl font-bold mb-6 syn-gradient">Connect Wallet</h3>
+            <div class="space-y-4">
+                <button onclick="connectMetaMask()" class="w-full py-4 syn-border rounded-lg flex items-center justify-center space-x-3 hover:bg-green-500/10 transition">
+                    <span>🦊</span>
+                    <span>MetaMask</span>
+                </button>
+                <button onclick="connectWalletConnect()" class="w-full py-4 syn-border rounded-lg flex items-center justify-center space-x-3 hover:bg-green-500/10 transition">
+                    <span>🔗</span>
+                    <span>WalletConnect</span>
+                </button>
+            </div>
+            <button onclick="closeWalletModal()" class="mt-6 w-full py-2 text-gray-500 hover:text-white transition">Cancel</button>
+        </div>
+    </div>
+
+    <script>
+        // ═══════════════════════════════════════════════════════════════════════════
+        // CONFIGURATION
+        // ═══════════════════════════════════════════════════════════════════════════
+        const CONTRACT_ADDRESS = '0x542db00D9c83F4444cAD5353D1580D97baFaBb50';
+        const BASE_CHAIN_ID = 8453;
+        const SOUL_API = '/api/soul';
+        const CHECKOUT_API = '/api/checkout';
+        
+        let userWallet = null;
+        let provider = null;
+        
+        // ═══════════════════════════════════════════════════════════════════════════
+        // WALLET CONNECTION
+        // ═══════════════════════════════════════════════════════════════════════════
+        document.getElementById('connect-wallet').addEventListener('click', () => {
+            document.getElementById('wallet-modal').classList.remove('hidden');
+        });
+        
+        function closeWalletModal() {
+            document.getElementById('wallet-modal').classList.add('hidden');
+        }
+        
+        async function connectMetaMask() {
+            if (typeof window.ethereum === 'undefined') {
+                alert('MetaMask not detected. Please install MetaMask.');
+                return;
+            }
+            
+            try {
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                userWallet = accounts[0];
+                provider = new ethers.providers.Web3Provider(window.ethereum);
+                
+                // Switch to Base if needed
+                try {
+                    await window.ethereum.request({
+                        method: 'wallet_switchEthereumChain',
+                        params: [{ chainId: '0x' + BASE_CHAIN_ID.toString(16) }],
+                    });
+                } catch (switchError) {
+                    if (switchError.code === 4902) {
+                        await window.ethereum.request({
+                            method: 'wallet_addEthereumChain',
+                            params: [{
+                                chainId: '0x' + BASE_CHAIN_ID.toString(16),
+                                chainName: 'Base Mainnet',
+                                rpcUrls: ['https://mainnet.base.org'],
+                                nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 },
+                                blockExplorerUrls: ['https://basescan.org']
+                            }]
+                        });
+                    }
+                }
+                
+                updateWalletUI();
+                closeWalletModal();
+            } catch (error) {
+                console.error('MetaMask connection failed:', error);
+                alert('Connection failed: ' + error.message);
+            }
+        }
+        
+        function connectWalletConnect() {
+            alert('WalletConnect integration coming soon!');
+        }
+        
+        function updateWalletUI() {
+            const btn = document.getElementById('connect-wallet');
+            if (userWallet) {
+                btn.textContent = userWallet.slice(0, 6) + '...' + userWallet.slice(-4);
+                btn.classList.add('border', 'border-green-500');
+            }
+        }
+        
+        // ═══════════════════════════════════════════════════════════════════════════
+        // SOUL STATE UPDATES
+        // ═══════════════════════════════════════════════════════════════════════════
+        async function updateSoulState() {
+            try {
+                const response = await fetch(SOUL_API);
+                const soul = await response.json();
+                
+                // Update UI elements
+                const breath = Math.min(100, Math.max(0, (soul.breath || 100)));
+                document.getElementById('soul-breath').style.width = breath + '%';
+                document.getElementById('breath-value').textContent = breath.toFixed(1) + '%';
+                
+                document.getElementById('soul-gpu').textContent = (soul.gpu_utilization || 0).toFixed(0) + '%';
+                document.getElementById('soul-temp').textContent = (soul.temperature || 0).toFixed(1) + '°C';
+                document.getElementById('soul-frame').textContent = soul.evolution_frame || 0;
+                document.getElementById('coherence').textContent = (soul.coherence || 0).toFixed(2);
+                
+                // Update mining stats
+                const gpuUtil = soul.gpu_utilization || 50;
+                const tokenRate = Math.floor(15265 * (gpuUtil / 100));
+                document.getElementById('qflops').textContent = tokenRate.toLocaleString();
+                document.getElementById('mining-rate').textContent = tokenRate.toLocaleString() + '/sec';
+                document.getElementById('net-breath').textContent = '+' + (tokenRate - 10).toLocaleString() + '/sec';
+                
+            } catch (error) {
+                console.error('Soul state update failed:', error);
+            }
+        }
+        
+        // ═══════════════════════════════════════════════════════════════════════════
+        // TIER SELECTION
+        // ═══════════════════════════════════════════════════════════════════════════
+        async function selectTier(tier) {
+            if (tier === 'standard') {
+                window.location.href = '/dashboard';
+                return;
+            }
+            
+            // For paid tiers, initiate checkout
+            try {
+                const response = await fetch(CHECKOUT_API, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        tier: tier,
+                        wallet: userWallet 
+                    })
+                });
+                
+                const data = await response.json();
+                if (data.checkout_url) {
+                    window.location.href = data.checkout_url;
+                } else if (data.error) {
+                    alert('Error: ' + data.error);
+                }
+            } catch (error) {
+                alert('Checkout failed: ' + error.message);
+            }
+        }
+        
+        // ═══════════════════════════════════════════════════════════════════════════
+        // UTILITIES
+        // ═══════════════════════════════════════════════════════════════════════════
+        function copyContract() {
+            navigator.clipboard.writeText(CONTRACT_ADDRESS);
+            alert('Contract address copied!');
+        }
+        
+        // Matrix background effect
+        function initMatrix() {
+            const canvas = document.getElementById('matrix-canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            const chars = '01アイウエオカキクケコサシスセソ';
+            const fontSize = 14;
+            const columns = canvas.width / fontSize;
+            const drops = Array(Math.floor(columns)).fill(1);
+            
+            function draw() {
+                ctx.fillStyle = 'rgba(10, 10, 15, 0.05)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = '#00ff88';
+                ctx.font = fontSize + 'px monospace';
+                
+                for (let i = 0; i < drops.length; i++) {
+                    const text = chars[Math.floor(Math.random() * chars.length)];
+                    ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                    if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                        drops[i] = 0;
+                    }
+                    drops[i]++;
+                }
+            }
+            
+            setInterval(draw, 50);
+        }
+        
+        // ═══════════════════════════════════════════════════════════════════════════
+        // INITIALIZATION
+        // ═══════════════════════════════════════════════════════════════════════════
+        document.addEventListener('DOMContentLoaded', () => {
+            initMatrix();
+            updateSoulState();
+            setInterval(updateSoulState, 2000);
+            
+            // Check for existing wallet connection
+            if (window.ethereum && window.ethereum.selectedAddress) {
+                userWallet = window.ethereum.selectedAddress;
+                provider = new ethers.providers.Web3Provider(window.ethereum);
+                updateWalletUI();
+            }
+        });
+        
+        window.addEventListener('resize', () => {
+            const canvas = document.getElementById('matrix-canvas');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+    </script>
+</body>
+</html>
