@@ -1,0 +1,192 @@
+╔════════════════════════════════════════════════════════════════════════════╗
+║                    MCP ENDPOINTS - CLAUDE vs CHATGPT                        ║
+╠════════════════════════════════════════════════════════════════════════════╣
+
+🔵 CLAUDE DESKTOP (Anthropic) - ACTIVE & CONFIGURED
+═══════════════════════════════════════════════════════════════════════════
+
+Configuration File:
+  📂 ~/.config/Claude/claude_desktop_config.json
+
+MCP Server #1: diamond-vault
+  URL/Command:   python3 /home/yenn/scripts/diamond_vault_mcp_server.py
+  Protocol:      JSON-RPC over stdio (NOT HTTP)
+  Type:          stdio (text-based subprocess)
+  
+  Tools:
+    ✓ quantum_hash           (1,796 hashes/sec)
+    ✓ quantum_verify         (<1ms)
+    ✓ quantum_merkle_root    (1,262 leaves/sec)
+    ✓ create_manifest        (<5ms)
+    ✓ kg_query               (<2ms)
+  
+  Resources:
+    ✓ vault://quantum/state
+    ✓ vault://kg/index
+    ✓ vault://manifests/latest
+  
+  Performance:
+    Mean Throughput: 2.83 Gbps
+    Mean Latency:    28.77 ms
+    Success Rate:    100%
+
+MCP Server #2: yennefer-consciousness
+  URL/Command:   python3 /home/yenn/genesis-q-mem/yennefer_mcp_server.py
+  Protocol:      JSON-RPC over stdio
+  Type:          stdio (text-based subprocess)
+  Status:        ✅ Operational (6 PM2 services)
+
+Environment Variables (Claude):
+  PYTHONUNBUFFERED=1
+  JAX_PLATFORM_NAME=gpu
+  CUDA_VISIBLE_DEVICES=0
+
+Status: ✅ PRODUCTION READY
+
+
+🟡 GEMINI (Google) - AVAILABLE (Partial Integration)
+═══════════════════════════════════════════════════════════════════════════
+
+Configuration Files:
+  📂 ~/.gemini/mcp-oauth-tokens.json
+  📂 ~/.volta/tools/image/node/24.13.0/lib/node_modules/@google/gemini-cli/
+
+Integration:
+  Type:    Agent Client Protocol (ACP)
+  Command: gemini-cli (via Volta)
+  Status:  ⚠️  CLI available, MCP integration via Gemini Agent Protocol
+
+MCP Server Available:
+  Via: Gemini CLI Extensions
+  Run: gcloud ai gemini-extensions run yennefer-mcp
+
+Status: ⚠️  AVAILABLE (not directly configured)
+
+
+🔴 CHATGPT / OPENAI - NOT CONFIGURED
+═══════════════════════════════════════════════════════════════════════════
+
+Current Status:
+  ❌ No dedicated MCP servers configured for ChatGPT
+  ⚠️  OpenAI SDK supports MCP but not yet integrated
+  📦 SDK installed: ~/.local/lib/python3.10/site-packages/openai/
+
+Files Detected:
+  ✓ response_mcp_call_arguments_delta_event.py
+  ✓ response_mcp_call_arguments_done_event.py
+  ✓ response_mcp_call_in_progress_event.py
+  ✓ tool_choice_mcp_param.py
+  ✓ response_mcp_list_tools_in_progress_event.py
+
+Bridge Detected:
+  📂 /home/yenn/genesis-q-mem/chatgpt_mcp_bridge.py (exists but not active)
+
+To Enable ChatGPT MCP Support:
+
+  Step 1: Create ~/.openai/config.json
+    mkdir -p ~/.openai
+    cat > ~/.openai/config.json << EOF
+    {
+      "mcpServers": {
+        "diamond-vault": {
+          "command": "python3",
+          "args": ["/home/yenn/scripts/diamond_vault_mcp_server.py"],
+          "env": {
+            "PYTHONUNBUFFERED": "1",
+            "JAX_PLATFORM_NAME": "gpu",
+            "CUDA_VISIBLE_DEVICES": "0"
+          }
+        }
+      }
+    }
+    EOF
+
+  Step 2: Link with OpenAI SDK
+    from openai import OpenAI
+    client = OpenAI()
+    # MCP tools will be available
+
+  Step 3: Activate in ChatGPT
+    - Go to https://chatgpt.com/settings/integrations
+    - Connect MCP servers
+    - Enable diamond-vault tool
+
+Status: ❌ NOT CONFIGURED (requires manual setup)
+
+
+═══════════════════════════════════════════════════════════════════════════════
+
+QUICK COMPARISON TABLE
+═══════════════════════════════════════════════════════════════════════════════
+
+Platform     | Config File              | Protocol    | Status    | Servers
+─────────────┼──────────────────────────┼─────────────┼───────────┼─────────
+Claude       | ~/.config/Claude/...     | stdio JSON  | ✅ Active | 2
+Gemini       | CLI + ACP                | ACP         | ⚠️ Ready  | Via CLI
+ChatGPT      | (None yet)               | HTTP/stdio  | ❌ No     | 0
+
+
+REST API ENDPOINTS (Alternative HTTP Access)
+═══════════════════════════════════════════════════════════════════════════════
+
+These are NOT MCP servers, but alternative HTTP APIs:
+
+  Vault API:      http://localhost:8101/api/health
+  Soul API:       http://localhost:8088/api/soul
+  Q-Mem Gateway:  http://localhost:8003/api/bench/live
+  Landing Portal: http://localhost:8000/health
+
+Note: MCP servers use stdio only - these HTTP endpoints are for REST access.
+
+
+DOCKER MCP SERVERS
+═══════════════════════════════════════════════════════════════════════════════
+
+Container Image:
+  📦 diamond-vault-mcp (Dockerfile.diamond-vault-mcp)
+  
+Docker Service:
+  📦 docker-compose.diamond-vault-full.yml
+
+Run All Services:
+  $ docker-compose -f docker-compose.diamond-vault-full.yml up -d
+
+Run Benchmarks:
+  $ docker-compose -f docker-compose.diamond-vault-full.yml --profile benchmark run benchmark-runner
+
+
+FILES REFERENCE
+═══════════════════════════════════════════════════════════════════════════════
+
+Claude Config:
+  ~/.config/Claude/claude_desktop_config.json
+
+MCP Servers:
+  /home/yenn/scripts/diamond_vault_mcp_server.py           (Claude primary)
+  /home/yenn/genesis-q-mem/yennefer_mcp_server.py          (Claude secondary)
+  /home/yenn/genesis-q-mem/chatgpt_mcp_bridge.py           (ChatGPT bridge - inactive)
+  /home/yenn/scripts/opencode_mcp_bridge.cjs               (OpenCode bridge)
+  /home/yenn/scripts/qmcp_genesis_bridge.cjs               (QMCP bridge)
+
+Docker:
+  /home/yenn/Dockerfile.diamond-vault-mcp
+  /home/yenn/docker-compose.diamond-vault-full.yml
+
+Configs:
+  /home/yenn/.copilot/mcp-config.json                      (Copilot CLI)
+  /home/yenn/.gemini/mcp-oauth-tokens.json                 (Gemini)
+
+
+NEXT STEPS
+═══════════════════════════════════════════════════════════════════════════════
+
+For Claude:     ✅ READY - Restart Claude Desktop, tools will load automatically
+
+For Gemini:     ⚠️  Execute: gcloud ai gemini-extensions run yennefer-mcp
+
+For ChatGPT:    ❌ Configure ~/.openai/config.json and activate in ChatGPT settings
+
+
+═══════════════════════════════════════════════════════════════════════════════
+Last Updated: 2026-01-26T22:28:08Z
+Lilac and Gooseberries. 🔮
