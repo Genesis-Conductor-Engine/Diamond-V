@@ -1,0 +1,146 @@
+version: '3.8'
+
+services:
+  # Main Diamond Vault Verifier API
+  diamond-vault:
+    build:
+      context: .
+      dockerfile: Dockerfile.diamond-vault
+    container_name: diamond-vault-verifier
+    restart: unless-stopped
+    ports:
+      - "8101:8101"
+    volumes:
+      - vault-data:/data/diamond_vault
+      - kg-data:/data/kg_storage
+      - vault-logs:/data/logs
+    environment:
+      - VAULT_TIER=ONYX_TIER
+      - FLASK_ENV=production
+      - PYTHONUNBUFFERED=1
+      - OFFLOAD_MODE=always
+      - DUAL_BRIDGE_ENABLED=true
+    networks:
+      - yennefer-net
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8101/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # MCP Server for Claude Desktop (stdio-based)
+  diamond-vault-mcp:
+    build:
+      context: .
+      dockerfile: Dockerfile.diamond-vault-mcp
+    container_name: diamond-vault-mcp
+    restart: unless-stopped
+    volumes:
+      - vault-data:/data/diamond_vault
+      - kg-data:/data/kg_storage
+    environment:
+      - PYTHONUNBUFFERED=1
+      - JAX_PLATFORM_NAME=gpu
+      - CUDA_VISIBLE_DEVICES=0
+      - OFFLOAD_MODE=always
+    networks:
+      - yennefer-net
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    stdin_open: true
+    tty: true
+
+  # KG-Index Generator (cron-like)
+  kg-index-generator:
+    build:
+      context: .
+      dockerfile: Dockerfile.diamond-vault
+    container_name: kg-index-generator
+    restart: unless-stopped
+    volumes:
+      - vault-data:/data/diamond_vault
+      - kg-data:/data/kg_storage
+    environment:
+      - VAULT_TIER=ONYX_TIER
+      - PYTHONUNBUFFERED=1
+    networks:
+      - yennefer-net
+    command: >
+      sh -c "while true; do
+        echo '[KG-Index] Generating...';
+        python3 /app/scripts/generate_kg_index.py 2>/dev/null || true;
+        sleep 1800;
+      done"
+
+  # Double Loop Verifier
+  double-loop-verifier:
+    build:
+      context: .
+      dockerfile: Dockerfile.diamond-vault
+    container_name: double-loop-verifier
+    restart: unless-stopped
+    depends_on:
+      - diamond-vault
+    volumes:
+      - vault-data:/data/diamond_vault
+    environment:
+      - VAULT_API=http://diamond-vault:8101
+      - PYTHONUNBUFFERED=1
+    networks:
+      - yennefer-net
+    command: >
+      sh -c "sleep 30; while true; do
+        echo '[Double-Loop] Verifying...';
+        python3 /app/scripts/diamond_vault_double_loop.py 2>/dev/null || true;
+        sleep 3600;
+      done"
+
+  # Benchmark Runner (on-demand)
+  benchmark-runner:
+    build:
+      context: .
+      dockerfile: Dockerfile.diamond-vault-mcp
+    container_name: vault-benchmark
+    volumes:
+      - vault-data:/data/diamond_vault
+      - ./telemetry_validated.csv:/data/telemetry.csv
+    environment:
+      - PYTHONUNBUFFERED=1
+      - JAX_PLATFORM_NAME=gpu
+      - CUDA_VISIBLE_DEVICES=0
+    networks:
+      - yennefer-net
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    profiles:
+      - benchmark
+    command: python3 /app/scripts/docker_mcp_integration.py
+
+volumes:
+  vault-data:
+    driver: local
+  kg-data:
+    driver: local
+  vault-logs:
+    driver: local
+
+networks:
+  yennefer-net:
+    driver: bridge

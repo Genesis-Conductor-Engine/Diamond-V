@@ -1,0 +1,1052 @@
+{
+  "verification": {
+    "loop1_infrastructure": {
+      "passed": true,
+      "docker": {
+        "dockerfile": true,
+        "compose": true,
+        "mcp_server": true,
+        "claude_config": true,
+        "vault_dir": true
+      },
+      "mcp": {
+        "valid": true,
+        "servers": [
+          "diamond-vault",
+          "yennefer-consciousness"
+        ]
+      }
+    },
+    "loop2_functionality": {
+      "passed": true,
+      "test_result": {
+        "test_id": 0,
+        "timestamp": "2026-01-26T22:22:32.483833+00:00",
+        "data_size_mb": 1,
+        "hash_time_ms": 2.413814014289528,
+        "merkle_time_ms": 3.7256009527482092,
+        "throughput_gbps": 3.236579104169092,
+        "hash": "aefe780a0816b131",
+        "status": "CRYSTALLINE"
+      }
+    },
+    "overall": true
+  },
+  "benchmark": {
+    "total_tests": 100,
+    "success_rate": 100.0,
+    "throughput": {
+      "mean_gbps": 2.8314448713113602,
+      "min_gbps": 1.3038614316624155,
+      "max_gbps": 3.3609508573890206
+    },
+    "latency": {
+      "mean_ms": 28.771061141742393,
+      "min_ms": 23.244909942150116,
+      "max_ms": 59.918176964856684
+    },
+    "timestamp": "2026-01-26T22:22:38.185133+00:00"
+  },
+  "results": [
+    {
+      "test_id": 1,
+      "timestamp": "2026-01-26T22:22:32.544355+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 31.426977016963065,
+      "merkle_time_ms": 6.966302986256778,
+      "throughput_gbps": 2.485921568524747,
+      "hash": "c1aef37a9aa0d332",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 2,
+      "timestamp": "2026-01-26T22:22:32.613865+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 43.381726020015776,
+      "merkle_time_ms": 3.3478999976068735,
+      "throughput_gbps": 1.8008734821651429,
+      "hash": "a9bf3f727a2d75aa",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 3,
+      "timestamp": "2026-01-26T22:22:32.665326+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 24.542349041439593,
+      "merkle_time_ms": 3.490820003207773,
+      "throughput_gbps": 3.1832731197851705,
+      "hash": "337ed31293ce6e0a",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 4,
+      "timestamp": "2026-01-26T22:22:32.712816+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 24.501076026353985,
+      "merkle_time_ms": 3.3526530023664236,
+      "throughput_gbps": 3.188635467110373,
+      "hash": "f1d0a662ce5ba817",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 5,
+      "timestamp": "2026-01-26T22:22:32.764206+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 28.047901985701174,
+      "merkle_time_ms": 3.3972589881159365,
+      "throughput_gbps": 2.7854133275218995,
+      "hash": "4ad25e340d1291bd",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 6,
+      "timestamp": "2026-01-26T22:22:32.814852+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 24.92241800064221,
+      "merkle_time_ms": 4.00252197869122,
+      "throughput_gbps": 3.1347279384362645,
+      "hash": "3f1d9769f4d19843",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 7,
+      "timestamp": "2026-01-26T22:22:32.865030+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 26.131106016691774,
+      "merkle_time_ms": 3.6997010465711355,
+      "throughput_gbps": 2.98973185253223,
+      "hash": "6b050d61e19ea297",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 8,
+      "timestamp": "2026-01-26T22:22:32.911945+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 23.812393948901445,
+      "merkle_time_ms": 3.37966502411291,
+      "throughput_gbps": 3.28085450659211,
+      "hash": "5dc04f2990dca293",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 9,
+      "timestamp": "2026-01-26T22:22:32.964892+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 26.849105022847652,
+      "merkle_time_ms": 3.362710995133966,
+      "throughput_gbps": 2.9097804166477186,
+      "hash": "1f71e19336d9c0df",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 10,
+      "timestamp": "2026-01-26T22:22:33.022248+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 31.08784998767078,
+      "merkle_time_ms": 3.4528839751146734,
+      "throughput_gbps": 2.513039661185441,
+      "hash": "d228a1d3bccb4802",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 11,
+      "timestamp": "2026-01-26T22:22:33.072879+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 28.162489994429052,
+      "merkle_time_ms": 3.4357000258751214,
+      "throughput_gbps": 2.7740799913450216,
+      "hash": "c1a1f84653efc4a9",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 12,
+      "timestamp": "2026-01-26T22:22:33.119654+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 23.946663015522063,
+      "merkle_time_ms": 3.358618007041514,
+      "throughput_gbps": 3.262458737961106,
+      "hash": "b5d8714987ebfc6d",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 13,
+      "timestamp": "2026-01-26T22:22:33.166073+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 24.087462981697172,
+      "merkle_time_ms": 3.334054024890065,
+      "throughput_gbps": 3.2433884821893937,
+      "hash": "25d0b9ec3045ecb3",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 14,
+      "timestamp": "2026-01-26T22:22:33.223086+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 24.75577301811427,
+      "merkle_time_ms": 3.393599996343255,
+      "throughput_gbps": 3.1558295490443564,
+      "hash": "a227c937644d66c3",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 15,
+      "timestamp": "2026-01-26T22:22:33.269525+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 24.123097013216466,
+      "merkle_time_ms": 3.3659570035524666,
+      "throughput_gbps": 3.238597430387864,
+      "hash": "cb523320777f4e14",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 16,
+      "timestamp": "2026-01-26T22:22:33.316191+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 24.55744700273499,
+      "merkle_time_ms": 3.395988023839891,
+      "throughput_gbps": 3.1813160379130263,
+      "hash": "77292ff468fb7357",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 17,
+      "timestamp": "2026-01-26T22:22:33.381737+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 36.25435696449131,
+      "merkle_time_ms": 3.3554619876667857,
+      "throughput_gbps": 2.154913410173518,
+      "hash": "b4ea3e09d665608a",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 18,
+      "timestamp": "2026-01-26T22:22:33.447216+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 36.334576027002186,
+      "merkle_time_ms": 9.431131009478122,
+      "throughput_gbps": 2.1501558169260346,
+      "hash": "5f9260b96ca63c2b",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 19,
+      "timestamp": "2026-01-26T22:22:33.503374+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 32.22525800811127,
+      "merkle_time_ms": 3.3927829936146736,
+      "throughput_gbps": 2.4243405585871654,
+      "hash": "9edfe7ffaedc915b",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 20,
+      "timestamp": "2026-01-26T22:22:33.553662+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 24.80761200422421,
+      "merkle_time_ms": 5.546820000745356,
+      "throughput_gbps": 3.1492350003981424,
+      "hash": "1412c66319a79b37",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 21,
+      "timestamp": "2026-01-26T22:22:33.624953+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 29.851572995539755,
+      "merkle_time_ms": 3.612259984947741,
+      "throughput_gbps": 2.6171150180820613,
+      "hash": "b3d0b2d38ceea5b0",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 22,
+      "timestamp": "2026-01-26T22:22:33.672157+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 24.311254965141416,
+      "merkle_time_ms": 3.40438901912421,
+      "throughput_gbps": 3.2135321731444626,
+      "hash": "3164e9db0f7bfc82",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 23,
+      "timestamp": "2026-01-26T22:22:33.728616+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 33.382539986632764,
+      "merkle_time_ms": 4.193482978735119,
+      "throughput_gbps": 2.3402952570799966,
+      "hash": "f4916e2eb58336c2",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 24,
+      "timestamp": "2026-01-26T22:22:33.782474+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 24.07500398112461,
+      "merkle_time_ms": 5.548488989006728,
+      "throughput_gbps": 3.2450669607885385,
+      "hash": "b1f3ae9d2658bd6f",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 25,
+      "timestamp": "2026-01-26T22:22:33.838311+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 27.350338001269847,
+      "merkle_time_ms": 3.355078981257975,
+      "throughput_gbps": 2.8564546440476435,
+      "hash": "ceac74ebaea1cf62",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 26,
+      "timestamp": "2026-01-26T22:22:33.891319+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 25.079326995182782,
+      "merkle_time_ms": 3.463427012320608,
+      "throughput_gbps": 3.115115489941424,
+      "hash": "a008033ce18cf111",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 27,
+      "timestamp": "2026-01-26T22:22:33.949328+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 32.48478000750765,
+      "merkle_time_ms": 4.466180980671197,
+      "throughput_gbps": 2.4049724203748433,
+      "hash": "4eba11e47d08de07",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 28,
+      "timestamp": "2026-01-26T22:22:33.999562+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 27.21511898562312,
+      "merkle_time_ms": 3.3636449952609837,
+      "throughput_gbps": 2.8706470120990817,
+      "hash": "bdf0ba5f7fcccb6c",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 29,
+      "timestamp": "2026-01-26T22:22:34.054058+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 31.06671100249514,
+      "merkle_time_ms": 3.9885370060801506,
+      "throughput_gbps": 2.5147496300372882,
+      "hash": "7cc96aeb91dbb14a",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 30,
+      "timestamp": "2026-01-26T22:22:34.102412+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 24.159778957255185,
+      "merkle_time_ms": 4.808472003787756,
+      "throughput_gbps": 3.233680247581034,
+      "hash": "cc06ef408aa5cfca",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 31,
+      "timestamp": "2026-01-26T22:22:34.159824+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 30.11631697881967,
+      "merkle_time_ms": 3.8379530305974185,
+      "throughput_gbps": 2.5941087037616213,
+      "hash": "bcbdaf7ad8194458",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 32,
+      "timestamp": "2026-01-26T22:22:34.234456+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 48.67318400647491,
+      "merkle_time_ms": 6.370738963596523,
+      "throughput_gbps": 1.6050932683920403,
+      "hash": "675822b485f02285",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 33,
+      "timestamp": "2026-01-26T22:22:34.309272+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 35.926106036640704,
+      "merkle_time_ms": 3.5282240132801235,
+      "throughput_gbps": 2.174602499929189,
+      "hash": "8d5e4ab32a5d24f9",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 34,
+      "timestamp": "2026-01-26T22:22:34.367308+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 34.494283027015626,
+      "merkle_time_ms": 3.78303398611024,
+      "throughput_gbps": 2.2648680634646956,
+      "hash": "f7f0bf91085cb5f5",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 35,
+      "timestamp": "2026-01-26T22:22:34.419489+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 26.74434398068115,
+      "merkle_time_ms": 6.346704030875117,
+      "throughput_gbps": 2.9211784015503914,
+      "hash": "1443e29c6201e59b",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 36,
+      "timestamp": "2026-01-26T22:22:34.482727+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 30.376756039913744,
+      "merkle_time_ms": 7.926344987936318,
+      "throughput_gbps": 2.571867776050449,
+      "hash": "3c7d2087cdd97e02",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 37,
+      "timestamp": "2026-01-26T22:22:34.548203+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 24.71782302018255,
+      "merkle_time_ms": 3.58871603384614,
+      "throughput_gbps": 3.1606747866189315,
+      "hash": "28db2c8bcd918fbc",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 38,
+      "timestamp": "2026-01-26T22:22:34.599419+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 27.06190600292757,
+      "merkle_time_ms": 3.6427680170163512,
+      "throughput_gbps": 2.8868993925094704,
+      "hash": "72b9473202e5d42f",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 39,
+      "timestamp": "2026-01-26T22:22:34.654215+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 24.713679973501712,
+      "merkle_time_ms": 3.3267129911109805,
+      "throughput_gbps": 3.1612046479426175,
+      "hash": "f3c4fd8edbe7ed9a",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 40,
+      "timestamp": "2026-01-26T22:22:34.699723+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 23.76071101753041,
+      "merkle_time_ms": 3.2629130291752517,
+      "throughput_gbps": 3.2879908325285454,
+      "hash": "20a36d9502c2f834",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 41,
+      "timestamp": "2026-01-26T22:22:34.746292+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 23.909946030471474,
+      "merkle_time_ms": 3.5577600356191397,
+      "throughput_gbps": 3.267468688571501,
+      "hash": "33d5ebec23997350",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 42,
+      "timestamp": "2026-01-26T22:22:34.794028+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 23.45913997851312,
+      "merkle_time_ms": 3.2817830215208232,
+      "throughput_gbps": 3.330258486524095,
+      "hash": "b481ce4912dbd541",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 43,
+      "timestamp": "2026-01-26T22:22:34.839931+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 23.63133995095268,
+      "merkle_time_ms": 3.401846974156797,
+      "throughput_gbps": 3.305991118664875,
+      "hash": "b2c1c57cc6389589",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 44,
+      "timestamp": "2026-01-26T22:22:34.885737+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 23.34729302674532,
+      "merkle_time_ms": 3.387818986084312,
+      "throughput_gbps": 3.3462123386426206,
+      "hash": "8de3fb7aa3ea83fd",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 45,
+      "timestamp": "2026-01-26T22:22:34.931394+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 23.551928985398263,
+      "merkle_time_ms": 3.3516560215502977,
+      "throughput_gbps": 3.3171380589859956,
+      "hash": "ddf66f2c1256e4bf",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 46,
+      "timestamp": "2026-01-26T22:22:34.987894+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 26.13030094653368,
+      "merkle_time_ms": 3.42067499877885,
+      "throughput_gbps": 2.989823965665565,
+      "hash": "5a9aebb1d0f5891f",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 47,
+      "timestamp": "2026-01-26T22:22:35.034484+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 23.742883000522852,
+      "merkle_time_ms": 3.4142020158469677,
+      "throughput_gbps": 3.290459713686816,
+      "hash": "82c8067f65a96581",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 48,
+      "timestamp": "2026-01-26T22:22:35.091171+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 31.55925398459658,
+      "merkle_time_ms": 6.21934502851218,
+      "throughput_gbps": 2.4755021154217145,
+      "hash": "72c513772a9a191a",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 49,
+      "timestamp": "2026-01-26T22:22:35.139442+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 23.710710054729134,
+      "merkle_time_ms": 3.377282992005348,
+      "throughput_gbps": 3.294924522280085,
+      "hash": "a6157c73739485c8",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 50,
+      "timestamp": "2026-01-26T22:22:35.186115+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 23.841677990276366,
+      "merkle_time_ms": 3.3561279997229576,
+      "throughput_gbps": 3.2768247281866083,
+      "hash": "c8e6c0373356e4ad",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 51,
+      "timestamp": "2026-01-26T22:22:35.250256+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 29.297555971425027,
+      "merkle_time_ms": 3.3771379967220128,
+      "throughput_gbps": 2.666604684574992,
+      "hash": "695a1683d55c373c",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 52,
+      "timestamp": "2026-01-26T22:22:35.296395+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 23.688486020546407,
+      "merkle_time_ms": 3.4023980260826647,
+      "throughput_gbps": 3.2980157504467624,
+      "hash": "4e3295e10f514eec",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 53,
+      "timestamp": "2026-01-26T22:22:35.359876+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 33.11075799865648,
+      "merkle_time_ms": 3.3999349689111114,
+      "throughput_gbps": 2.3595050286426558,
+      "hash": "d2b136fcc2fdbc04",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 54,
+      "timestamp": "2026-01-26T22:22:35.406029+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 23.59866601182148,
+      "merkle_time_ms": 3.367949975654483,
+      "throughput_gbps": 3.310568485560336,
+      "hash": "391a962f95582315",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 55,
+      "timestamp": "2026-01-26T22:22:35.452670+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 24.081912997644395,
+      "merkle_time_ms": 3.5270219668745995,
+      "throughput_gbps": 3.244135962439608,
+      "hash": "0609488463b97020",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 56,
+      "timestamp": "2026-01-26T22:22:35.501364+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 24.609922023955733,
+      "merkle_time_ms": 3.770584997255355,
+      "throughput_gbps": 3.174532610219234,
+      "hash": "0d6fbc06ee19fbb8",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 57,
+      "timestamp": "2026-01-26T22:22:35.548659+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 24.797125020995736,
+      "merkle_time_ms": 3.4429620136506855,
+      "throughput_gbps": 3.1505668473200634,
+      "hash": "af15734a365c9142",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 58,
+      "timestamp": "2026-01-26T22:22:35.605729+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 23.799681977834553,
+      "merkle_time_ms": 3.4501119516789913,
+      "throughput_gbps": 3.282606888308863,
+      "hash": "13c2b58bcc9b4d2e",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 59,
+      "timestamp": "2026-01-26T22:22:35.665058+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 34.902054991107434,
+      "merkle_time_ms": 3.407385025639087,
+      "throughput_gbps": 2.238406879477589,
+      "hash": "07ed9e539a9fc183",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 60,
+      "timestamp": "2026-01-26T22:22:35.721047+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 25.187117978930473,
+      "merkle_time_ms": 3.373173007275909,
+      "throughput_gbps": 3.1017840177408593,
+      "hash": "ba12c6f7c1e10aa0",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 61,
+      "timestamp": "2026-01-26T22:22:35.768125+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 24.07337597105652,
+      "merkle_time_ms": 3.6943170125596225,
+      "throughput_gbps": 3.2452864149145464,
+      "hash": "31343bf3a0ad033e",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 62,
+      "timestamp": "2026-01-26T22:22:35.823029+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 28.954553010407835,
+      "merkle_time_ms": 3.448873001616448,
+      "throughput_gbps": 2.6981939583704726,
+      "hash": "4caea8427c247b9b",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 63,
+      "timestamp": "2026-01-26T22:22:35.876606+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 30.195862986147404,
+      "merkle_time_ms": 3.546244988683611,
+      "throughput_gbps": 2.587274953388167,
+      "hash": "964fd18958c864d7",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 64,
+      "timestamp": "2026-01-26T22:22:35.928020+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 27.937196020502597,
+      "merkle_time_ms": 4.258628992829472,
+      "throughput_gbps": 2.796451008994084,
+      "hash": "02a17c8fd7e9f2bb",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 65,
+      "timestamp": "2026-01-26T22:22:35.978203+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 26.46548399934545,
+      "merkle_time_ms": 3.797003999352455,
+      "throughput_gbps": 2.951958105203449,
+      "hash": "a3ece44f7338164f",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 66,
+      "timestamp": "2026-01-26T22:22:36.035321+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 32.8992209979333,
+      "merkle_time_ms": 3.3595069544389844,
+      "throughput_gbps": 2.374676288077087,
+      "hash": "38dd6ae17d73da94",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 67,
+      "timestamp": "2026-01-26T22:22:36.094292+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 33.37486204691231,
+      "merkle_time_ms": 6.357013015076518,
+      "throughput_gbps": 2.340833645699751,
+      "hash": "5317eba19fc66e8d",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 68,
+      "timestamp": "2026-01-26T22:22:36.149554+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 25.669047026894987,
+      "merkle_time_ms": 3.3777220523916185,
+      "throughput_gbps": 3.0435489061258796,
+      "hash": "1220ca7b90cb52e3",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 69,
+      "timestamp": "2026-01-26T22:22:36.196775+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 24.598393007181585,
+      "merkle_time_ms": 3.4454010310582817,
+      "throughput_gbps": 3.176020481386371,
+      "hash": "dfa75c7447e7872b",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 70,
+      "timestamp": "2026-01-26T22:22:36.257588+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 29.99541099416092,
+      "merkle_time_ms": 3.508577006869018,
+      "throughput_gbps": 2.604565078811831,
+      "hash": "61b5a5c3d8025164",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 71,
+      "timestamp": "2026-01-26T22:22:36.350837+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 50.1840979559347,
+      "merkle_time_ms": 9.144274983555079,
+      "throughput_gbps": 1.556768043705786,
+      "hash": "470dc082ec3dc20d",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 72,
+      "timestamp": "2026-01-26T22:22:36.415339+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 23.937316029332578,
+      "merkle_time_ms": 3.3968479838222265,
+      "throughput_gbps": 3.2637326550840666,
+      "hash": "aecfb1060f4c4824",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 73,
+      "timestamp": "2026-01-26T22:22:36.485012+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 23.72105000540614,
+      "merkle_time_ms": 3.8304280024021864,
+      "throughput_gbps": 3.2934882723233136,
+      "hash": "a318547788910c51",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 74,
+      "timestamp": "2026-01-26T22:22:36.532430+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 23.646477959118783,
+      "merkle_time_ms": 3.7194049800746143,
+      "throughput_gbps": 3.303874688444783,
+      "hash": "6aec77c98a2da319",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 75,
+      "timestamp": "2026-01-26T22:22:36.593158+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 29.46397301275283,
+      "merkle_time_ms": 3.3815240021795034,
+      "throughput_gbps": 2.651543292080308,
+      "hash": "8082612b24ccec01",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 76,
+      "timestamp": "2026-01-26T22:22:36.654203+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 25.34355001989752,
+      "merkle_time_ms": 3.3750809961929917,
+      "throughput_gbps": 3.082638380915978,
+      "hash": "f36074dc8e526654",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 77,
+      "timestamp": "2026-01-26T22:22:36.707427+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 23.85735302232206,
+      "merkle_time_ms": 3.3675329759716988,
+      "throughput_gbps": 3.2746717511746835,
+      "hash": "6297d07179c5d091",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 78,
+      "timestamp": "2026-01-26T22:22:36.753166+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 23.244909942150116,
+      "merkle_time_ms": 3.267032967414707,
+      "throughput_gbps": 3.3609508573890206,
+      "hash": "81cd2a9acc4e5a3b",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 79,
+      "timestamp": "2026-01-26T22:22:36.800507+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 24.51532700797543,
+      "merkle_time_ms": 3.289509972091764,
+      "throughput_gbps": 3.18678188443434,
+      "hash": "6df9206387edaf26",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 80,
+      "timestamp": "2026-01-26T22:22:36.851610+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 24.46042897645384,
+      "merkle_time_ms": 6.299861997831613,
+      "throughput_gbps": 3.1939341732397613,
+      "hash": "841c26094de2a639",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 81,
+      "timestamp": "2026-01-26T22:22:36.909451+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 23.66750402143225,
+      "merkle_time_ms": 3.3147369977086782,
+      "throughput_gbps": 3.300939546867867,
+      "hash": "637311cd63e3da18",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 82,
+      "timestamp": "2026-01-26T22:22:36.956284+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 24.234175973106176,
+      "merkle_time_ms": 3.35642701247707,
+      "throughput_gbps": 3.2237531033322138,
+      "hash": "fc2a6aca5bc10a1a",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 83,
+      "timestamp": "2026-01-26T22:22:37.001873+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 23.535549989901483,
+      "merkle_time_ms": 3.33619600860402,
+      "throughput_gbps": 3.31944654080833,
+      "hash": "0e8642bdfe0fe151",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 84,
+      "timestamp": "2026-01-26T22:22:37.048411+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 24.431912053842098,
+      "merkle_time_ms": 3.3966839546337724,
+      "throughput_gbps": 3.1976621325351515,
+      "hash": "8eebd0e081bb1e12",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 85,
+      "timestamp": "2026-01-26T22:22:37.126720+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 43.287558015435934,
+      "merkle_time_ms": 3.99367802310735,
+      "throughput_gbps": 1.804791112775208,
+      "hash": "e3d839edb9af78d8",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 86,
+      "timestamp": "2026-01-26T22:22:37.185250+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 33.46467000665143,
+      "merkle_time_ms": 6.088915979489684,
+      "throughput_gbps": 2.3345516326463667,
+      "hash": "ccf3c0d36816cf3f",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 87,
+      "timestamp": "2026-01-26T22:22:37.235535+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 24.700845999177545,
+      "merkle_time_ms": 3.410245990380645,
+      "throughput_gbps": 3.162847134976725,
+      "hash": "d8e1d46389fdea2e",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 88,
+      "timestamp": "2026-01-26T22:22:37.288059+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 26.915596041362733,
+      "merkle_time_ms": 6.505975034087896,
+      "throughput_gbps": 2.902592232397189,
+      "hash": "9e12b9d745225153",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 89,
+      "timestamp": "2026-01-26T22:22:37.387993+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 52.18229198362678,
+      "merkle_time_ms": 5.019850970711559,
+      "throughput_gbps": 1.4971553956371493,
+      "hash": "6ad81009108475bb",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 90,
+      "timestamp": "2026-01-26T22:22:37.494527+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 59.918176964856684,
+      "merkle_time_ms": 4.928350972477347,
+      "throughput_gbps": 1.3038614316624155,
+      "hash": "27a466a0e80192b4",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 91,
+      "timestamp": "2026-01-26T22:22:37.566661+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 25.018519023433328,
+      "merkle_time_ms": 3.387521021068096,
+      "throughput_gbps": 3.1226868355726833,
+      "hash": "1a06c4b762f6b06c",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 92,
+      "timestamp": "2026-01-26T22:22:37.614745+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 25.238664005883038,
+      "merkle_time_ms": 3.3671470009721816,
+      "throughput_gbps": 3.0954491086291,
+      "hash": "0baef71bd872baa0",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 93,
+      "timestamp": "2026-01-26T22:22:37.662705+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 24.389939033426344,
+      "merkle_time_ms": 3.3625169890001416,
+      "throughput_gbps": 3.203165038376271,
+      "hash": "66bd5a51b6ba2afd",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 94,
+      "timestamp": "2026-01-26T22:22:37.739361+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 39.96549901785329,
+      "merkle_time_ms": 6.0251629911363125,
+      "throughput_gbps": 1.954811072547854,
+      "hash": "589af384e63a85b6",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 95,
+      "timestamp": "2026-01-26T22:22:37.810011+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 26.19684801902622,
+      "merkle_time_ms": 5.484558001626283,
+      "throughput_gbps": 2.9822290049268316,
+      "hash": "f2f6e3765df48a8e",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 96,
+      "timestamp": "2026-01-26T22:22:37.907157+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 40.099269011989236,
+      "merkle_time_ms": 4.227948957122862,
+      "throughput_gbps": 1.9482898797143033,
+      "hash": "9faa9ce4cea9b191",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 97,
+      "timestamp": "2026-01-26T22:22:37.983201+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 29.75057397270575,
+      "merkle_time_ms": 3.546140040270984,
+      "throughput_gbps": 2.6259997562290627,
+      "hash": "510ffd3d4bf5be04",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 98,
+      "timestamp": "2026-01-26T22:22:38.050595+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 39.37561501516029,
+      "merkle_time_ms": 3.5359710454940796,
+      "throughput_gbps": 1.984095993673255,
+      "hash": "82b5a7fd58e429bd",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 99,
+      "timestamp": "2026-01-26T22:22:38.111431+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 34.057181037496775,
+      "merkle_time_ms": 6.653040996752679,
+      "throughput_gbps": 2.293936186732096,
+      "hash": "c7356adeac92fc2b",
+      "status": "CRYSTALLINE"
+    },
+    {
+      "test_id": 100,
+      "timestamp": "2026-01-26T22:22:38.179574+00:00",
+      "data_size_mb": 10,
+      "hash_time_ms": 36.66090499609709,
+      "merkle_time_ms": 3.416046965867281,
+      "throughput_gbps": 2.131016678620377,
+      "hash": "d9bc6a9eece95939",
+      "status": "CRYSTALLINE"
+    }
+  ]
+}
