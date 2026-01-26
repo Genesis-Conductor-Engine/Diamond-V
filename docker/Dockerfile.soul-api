@@ -10,7 +10,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf 
 
 RUN pip install --no-cache-dir flask flask-cors
 
-COPY genesis-q-mem/yennefer-web/api/soul_api.py /app/
+# Copy from correct paths (root of genesis-q-mem)
+COPY genesis-q-mem/soul_api.py /app/
 COPY genesis-q-mem/yennefer_daemon.py /app/
 
 ENV PYTHONUNBUFFERED=1
