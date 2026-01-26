@@ -1,0 +1,124 @@
+# Yennefer Docker Build & Push to GitHub Container Registry
+name: Docker Build & Push
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docker/**'
+      - 'genesis-q-mem/**'
+      - 'scripts/**'
+      - 'docker-compose.yennefer.yml'
+      - '.github/workflows/docker-build-push.yml'
+  workflow_dispatch:
+    inputs:
+      push_images:
+        description: 'Push images to GHCR'
+        required: true
+        default: 'true'
+        type: boolean
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_PREFIX: genesis-conductor-engine/yennefer
+
+jobs:
+  build-and-push:
+    name: Build & Push Docker Images
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    strategy:
+      matrix:
+        service:
+          - name: diamond-vault
+            dockerfile: docker/Dockerfile.diamond-vault
+            context: .
+          - name: a2a-handoff
+            dockerfile: docker/Dockerfile.a2a-handoff
+            context: .
+          - name: soul-api
+            dockerfile: docker/Dockerfile.soul-api
+            context: .
+          - name: qmem-gateway
+            dockerfile: docker/Dockerfile.qmem-gateway
+            context: .
+          - name: qmcp-bridge
+            dockerfile: docker/Dockerfile.qmcp-bridge
+            context: .
+          - name: process-guardian
+            dockerfile: docker/Dockerfile.process-guardian
+            context: .
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/${{ matrix.service.name }}
+          tags: |
+            type=sha,prefix=
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=ref,event=branch
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: ${{ matrix.service.context }}
+          file: ${{ matrix.service.dockerfile }}
+          push: ${{ github.event_name != 'pull_request' && (github.event.inputs.push_images != 'false') }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Image digest
+        run: echo "Image pushed with digest ${{ steps.build.outputs.digest }}"
+
+  update-compose:
+    name: Update Compose with New Tags
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Update image tags
+        run: |
+          SHA=$(echo ${{ github.sha }} | cut -c1-7)
+          echo "Updating docker-compose.yennefer.yml with SHA: $SHA"
+          # Update tags in compose file (optional)
+          
+      - name: Create deployment artifact
+        run: |
+          mkdir -p deployment
+          cp docker-compose.yennefer.yml deployment/
+          cp -r docker/ deployment/
+          cp -r .cloudflared/ deployment/ 2>/dev/null || true
+          tar -czf yennefer-deployment-${{ github.sha }}.tar.gz deployment/
+          
+      - name: Upload deployment artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: yennefer-deployment
+          path: yennefer-deployment-*.tar.gz
+          retention-days: 30

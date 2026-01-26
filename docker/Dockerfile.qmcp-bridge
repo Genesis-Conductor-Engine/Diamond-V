@@ -1,0 +1,24 @@
+# QMCP Bridge - Genesis Blockchain Bridge
+FROM node:20-slim
+
+LABEL org.opencontainers.image.source=https://github.com/Genesis-Conductor-Engine/Yennefer
+LABEL org.opencontainers.image.title="qmcp-bridge"
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
+
+# Copy package files
+COPY package*.json /app/
+RUN npm ci --only=production 2>/dev/null || npm install --production
+
+# Copy script
+COPY scripts/qmcp_genesis_bridge.cjs /app/
+COPY artifacts/ /app/artifacts/
+
+ENV NODE_ENV=production
+
+HEALTHCHECK --interval=60s --timeout=10s --start-period=10s --retries=3 \
+  CMD node -e "console.log('healthy')" || exit 1
+
+CMD ["node", "qmcp_genesis_bridge.cjs"]

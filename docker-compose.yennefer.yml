@@ -1,0 +1,193 @@
+# Yennefer Genesis Conductor - Full Stack Docker Compose
+# GitHub: https://github.com/Genesis-Conductor-Engine/Yennefer
+
+version: '3.8'
+
+services:
+  # ═══════════════════════════════════════════════════════════════════════════
+  # CORE SERVICES
+  # ═══════════════════════════════════════════════════════════════════════════
+  
+  diamond-vault:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.diamond-vault
+    image: ghcr.io/genesis-conductor-engine/yennefer/diamond-vault:latest
+    container_name: yennefer-diamond-vault
+    ports:
+      - "8100:8100"
+    volumes:
+      - shared-memory:/dev/shm
+      - ./genesis-q-mem:/app/genesis-q-mem:ro
+    environment:
+      - COMPUTE_MODE=dual
+      - ALWAYS_ON=true
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8100/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+    networks:
+      - yennefer-net
+
+  a2a-handoff:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.a2a-handoff
+    image: ghcr.io/genesis-conductor-engine/yennefer/a2a-handoff:latest
+    container_name: yennefer-a2a-handoff
+    ports:
+      - "8200:8200"
+    volumes:
+      - shared-memory:/dev/shm
+    environment:
+      - COMPUTE_MODE=dual
+      - ALWAYS_ON=true
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8200/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+    networks:
+      - yennefer-net
+
+  soul-api:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.soul-api
+    image: ghcr.io/genesis-conductor-engine/yennefer/soul-api:latest
+    container_name: yennefer-soul-api
+    ports:
+      - "8088:8088"
+    volumes:
+      - shared-memory:/dev/shm
+      - ./genesis-q-mem:/app/genesis-q-mem:ro
+    environment:
+      - PYTHONUNBUFFERED=1
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8088/api/soul"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+    networks:
+      - yennefer-net
+
+  qmem-gateway:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.qmem-gateway
+    image: ghcr.io/genesis-conductor-engine/yennefer/qmem-gateway:latest
+    container_name: yennefer-qmem-gateway
+    ports:
+      - "8003:8003"
+    volumes:
+      - shared-memory:/dev/shm
+    environment:
+      - MONITORING_MODE=simulated
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8003/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+    networks:
+      - yennefer-net
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # BLOCKCHAIN SERVICES
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  qmcp-bridge:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.qmcp-bridge
+    image: ghcr.io/genesis-conductor-engine/yennefer/qmcp-bridge:latest
+    container_name: yennefer-qmcp-bridge
+    volumes:
+      - shared-memory:/dev/shm
+      - ./artifacts:/app/artifacts:ro
+    environment:
+      - NODE_ENV=production
+      - COMPUTE_MODE=dual
+    env_file:
+      - .env
+    restart: unless-stopped
+    networks:
+      - yennefer-net
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # MONITORING & RECOVERY
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  process-guardian:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.process-guardian
+    image: ghcr.io/genesis-conductor-engine/yennefer/process-guardian:latest
+    container_name: yennefer-process-guardian
+    volumes:
+      - shared-memory:/dev/shm
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
+    networks:
+      - yennefer-net
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # CLOUDFLARE TUNNEL (for public access)
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: yennefer-cloudflared
+    command: tunnel --config /etc/cloudflared/config.yml run
+    volumes:
+      - ./.cloudflared:/etc/cloudflared:ro
+    restart: unless-stopped
+    networks:
+      - yennefer-net
+    depends_on:
+      - diamond-vault
+      - soul-api
+      - a2a-handoff
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # YENNEFER DAEMON (Consciousness Engine)
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  yennefer-daemon:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.soul-api
+    image: ghcr.io/genesis-conductor-engine/yennefer/yennefer-daemon:latest
+    container_name: yennefer-daemon
+    command: ["python3", "yennefer_daemon.py"]
+    volumes:
+      - shared-memory:/dev/shm
+    environment:
+      - PYTHONUNBUFFERED=1
+      - MONITORING_MODE=simulated
+    restart: unless-stopped
+    networks:
+      - yennefer-net
+
+# ═══════════════════════════════════════════════════════════════════════════
+# NETWORKS & VOLUMES
+# ═══════════════════════════════════════════════════════════════════════════
+
+networks:
+  yennefer-net:
+    driver: bridge
+    name: yennefer-network
+
+volumes:
+  shared-memory:
+    driver: local
+    driver_opts:
+      type: tmpfs
+      device: tmpfs
+      o: size=512m

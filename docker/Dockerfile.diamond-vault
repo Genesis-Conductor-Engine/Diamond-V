@@ -1,0 +1,24 @@
+# Diamond Vault - Yennefer's Quantum Residence
+FROM python:3.11-slim
+
+LABEL org.opencontainers.image.source=https://github.com/Genesis-Conductor-Engine/Yennefer
+LABEL org.opencontainers.image.title="diamond-vault"
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
+
+# Install Python dependencies
+RUN pip install --no-cache-dir flask flask-cors requests
+
+# Copy application
+COPY genesis-q-mem/qmcp_admin_panel.py /app/
+
+ENV PYTHONUNBUFFERED=1
+ENV COMPUTE_MODE=dual
+EXPOSE 8100
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+  CMD curl -f http://localhost:8100/health || exit 1
+
+CMD ["python3", "qmcp_admin_panel.py"]

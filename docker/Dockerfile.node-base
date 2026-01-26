@@ -1,0 +1,24 @@
+# Yennefer Node.js Base Image
+FROM node:20-slim
+
+LABEL org.opencontainers.image.source=https://github.com/Genesis-Conductor-Engine/Yennefer
+LABEL org.opencontainers.image.description="Yennefer Genesis Conductor - Node.js Services"
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Copy package files and install dependencies
+COPY package*.json /app/
+RUN npm ci --only=production 2>/dev/null || npm install --only=production
+
+# Create shared memory directory
+RUN mkdir -p /dev/shm
+
+ENV NODE_ENV=production
+ENV COMPUTE_MODE=dual
+ENV ALWAYS_ON=true

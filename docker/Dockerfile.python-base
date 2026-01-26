@@ -1,0 +1,26 @@
+# Yennefer Python Base Image
+FROM python:3.11-slim
+
+LABEL org.opencontainers.image.source=https://github.com/Genesis-Conductor-Engine/Yennefer
+LABEL org.opencontainers.image.description="Yennefer Genesis Conductor - Python Services"
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create app directory
+WORKDIR /app
+
+# Install common Python dependencies
+COPY requirements.txt /app/
+RUN pip install --no-cache-dir -r requirements.txt || true
+
+# Create shared memory directory (will be mounted)
+RUN mkdir -p /dev/shm
+
+# Default environment
+ENV PYTHONUNBUFFERED=1
+ENV COMPUTE_MODE=dual
+ENV ALWAYS_ON=true
