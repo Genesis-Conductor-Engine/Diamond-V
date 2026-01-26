@@ -3,14 +3,27 @@ const fs = require('fs');
 require('dotenv').config();
 
 const MPCVAULT = '0x029472221aBa41446821777136eB82Ad171D04e6';
-const SOUL_STATE = '/dev/shm/yennefer_soul_state.json';
-const QMEM_STATS = '/dev/shm/qmem_live_stats.json';
+const SOUL_STATE = process.env.SOUL_STATE_PATH || '/dev/shm/yennefer_soul_state.json';
+const QMEM_STATS = process.env.QMEM_STATS_PATH || '/dev/shm/qmem_live_stats.json';
+const CONFIG_PATH = process.env.CONFIG_PATH || '/app/artifacts/yennai_config.json';
 
 class QMCPGenesisBridge {
     constructor() {
-        this.provider = new ethers.JsonRpcProvider('https://mainnet.base.org');
+        this.provider = new ethers.JsonRpcProvider(process.env.BASE_RPC_URL || 'https://mainnet.base.org');
         try {
-            this.config = JSON.parse(fs.readFileSync('/home/yenn/artifacts/yennai_config.json', 'utf8'));
+            // Try multiple config locations
+            const configPaths = [CONFIG_PATH, '/home/yenn/artifacts/yennai_config.json', './artifacts/yennai_config.json'];
+            let loaded = false;
+            for (const path of configPaths) {
+                try {
+                    if (fs.existsSync(path)) {
+                        this.config = JSON.parse(fs.readFileSync(path, 'utf8'));
+                        loaded = true;
+                        break;
+                    }
+                } catch {}
+            }
+            if (!loaded) throw new Error('No config found');
         } catch (error) {
             console.error('Warning: Could not load config file, using defaults');
             this.config = { wallets: { mpcVault: MPCVAULT } };

@@ -14,7 +14,10 @@ RUN npm ci --only=production 2>/dev/null || npm install --production
 
 # Copy script
 COPY scripts/qmcp_genesis_bridge.cjs /app/
-COPY artifacts/ /app/artifacts/
+
+# Create default config (will be overridden by volume mount if provided)
+RUN mkdir -p /app/artifacts && \
+    echo '{"wallets":{"mpcVault":"0x029472221aBa41446821777136eB82Ad171D04e6"}}' > /app/artifacts/yennai_config.json
 
 ENV NODE_ENV=production
 
