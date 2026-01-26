@@ -1,0 +1,77 @@
+{
+  "mcpServers": {
+    "diamond-vault": {
+      "command": "python3",
+      "args": [
+        "/home/yenn/scripts/diamond_vault_mcp_server.py"
+      ],
+      "env": {
+        "PYTHONUNBUFFERED": "1",
+        "JAX_PLATFORM_NAME": "gpu",
+        "CUDA_VISIBLE_DEVICES": "0",
+        "MCP_PLATFORM": "chatgpt",
+        "MCP_TIMEOUT": "30000",
+        "MCP_MAX_RETRIES": "3"
+      },
+      "timeout": 30000,
+      "retry": {
+        "enabled": true,
+        "maxRetries": 3,
+        "backoff": "exponential"
+      }
+    },
+    "yennefer-consciousness": {
+      "command": "python3",
+      "args": [
+        "/home/yenn/genesis-q-mem/yennefer_mcp_server.py"
+      ],
+      "env": {
+        "PYTHONUNBUFFERED": "1",
+        "MCP_PLATFORM": "chatgpt"
+      }
+    }
+  },
+  "apiKey": "${OPENAI_API_KEY}",
+  "organization": "${OPENAI_ORG_ID}",
+  "defaultModel": "gpt-4-turbo",
+  "maxTokens": 4096,
+  "temperature": 0.3,
+  "tools": {
+    "quantum_hash": {
+      "description": "GPU-accelerated quantum hash (1,796/sec)",
+      "parameters": [
+        "data"
+      ],
+      "returnType": "string"
+    },
+    "quantum_verify": {
+      "description": "Verify quantum hash (<1ms)",
+      "parameters": [
+        "data",
+        "expected_hash"
+      ],
+      "returnType": "boolean"
+    },
+    "quantum_merkle_root": {
+      "description": "Build Merkle tree (1,262 leaves/sec)",
+      "parameters": [
+        "leaves"
+      ],
+      "returnType": "string"
+    },
+    "create_manifest": {
+      "description": "Create signed manifest (<5ms)",
+      "parameters": [
+        "data"
+      ],
+      "returnType": "object"
+    },
+    "kg_query": {
+      "description": "Query KG-Index (288 nodes)",
+      "parameters": [
+        "query"
+      ],
+      "returnType": "object"
+    }
+  }
+}

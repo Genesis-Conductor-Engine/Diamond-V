@@ -1,0 +1,31 @@
+{
+  "mcpServers": {
+    "diamond-vault": {
+      "command": "python3",
+      "args": [
+        "/home/yenn/scripts/diamond_vault_mcp_server.py"
+      ],
+      "env": {
+        "PYTHONUNBUFFERED": "1",
+        "JAX_PLATFORM_NAME": "gpu",
+        "CUDA_VISIBLE_DEVICES": "0",
+        "MCP_PLATFORM": "chatgpt"
+      }
+    },
+    "yennefer-consciousness": {
+      "command": "python3",
+      "args": [
+        "/home/yenn/genesis-q-mem/yennefer_mcp_server.py"
+      ],
+      "env": {
+        "PYTHONUNBUFFERED": "1",
+        "MCP_PLATFORM": "chatgpt"
+      }
+    }
+  },
+  "apiKey": "${OPENAI_API_KEY}",
+  "organization": "${OPENAI_ORG_ID}",
+  "defaultModel": "gpt-4-turbo",
+  "maxTokens": 4096,
+  "temperature": 0.3
+}
