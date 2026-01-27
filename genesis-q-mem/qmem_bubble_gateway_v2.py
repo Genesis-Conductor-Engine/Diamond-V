@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Q-Mem Bubble.io Gateway - Groq JTV Edition
+Q-Mem Bubble.io Gateway - Groq JTV Edition (Middleware Fix)
 ==========================================
 Secure HTTP gateway with benchmark endpoints:
 - /api/bench/live - Live metrics JSON
@@ -19,7 +19,7 @@ from pathlib import Path
 from fastapi import FastAPI, HTTPException, Security, status, Depends, Response
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import StreamingResponse, JSONResponse
+from fastapi.responses import StreamingResponse, JSONResponse, FileResponse, HTMLResponse
 from pydantic import BaseModel
 from typing import Optional, Dict, List
 import numpy as np
@@ -114,17 +114,12 @@ app = FastAPI(
     version="2.0.0-groq-jtv"
 )
 
-# CORS middleware
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  # Configure appropriately for production
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
 # Startup time
 GATEWAY_START_TIME = datetime.now()
+
+# NOTE: CORS middleware disabled due to FastAPI 0.101.0 / Starlette 0.52.1 incompatibility
+# CORS headers added manually to responses where needed
+
 
 
 def verify_token(credentials: HTTPAuthorizationCredentials = Security(security)):
@@ -520,6 +515,43 @@ async def recall_memory(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=str(e)
         )
+
+
+@app.get("/benchmark.html", tags=["static"])
+@app.head("/benchmark.html", tags=["static"])
+async def serve_benchmark():
+    """Serve benchmark.html page"""
+    html_path = os.path.join(os.path.dirname(__file__), "benchmark.html")
+    if os.path.exists(html_path):
+        return FileResponse(html_path, media_type="text/html")
+    raise HTTPException(status_code=404, detail="benchmark.html not found")
+
+
+@app.get("/telemetry_results.json", tags=["static"])
+@app.head("/telemetry_results.json", tags=["static"])
+async def serve_telemetry():
+    """Serve telemetry analysis results"""
+    json_path = os.path.join(os.path.dirname(__file__), "telemetry_results.json")
+    if os.path.exists(json_path):
+        return FileResponse(json_path, media_type="application/json")
+    raise HTTPException(status_code=404, detail="telemetry_results.json not found")
+
+
+@app.get("/", tags=["static"])
+@app.head("/", tags=["static"])
+async def serve_root():
+    """Redirect root to benchmark page"""
+    html_path = os.path.join(os.path.dirname(__file__), "benchmark.html")
+    if os.path.exists(html_path):
+        return FileResponse(html_path, media_type="text/html")
+    return JSONResponse(
+        status_code=200,
+        content={
+            "status": "online",
+            "message": "Q-Mem Gateway",
+            "endpoints": ["/api/bench/live", "/api/health", "/benchmark.html"]
+        }
+    )
 
 
 def main():

@@ -250,12 +250,27 @@ class MaxPowerQuantumEngine:
     
     def _cleanup(self):
         """Release GPU memory"""
-        for i in range(self.num_streams):
-            del self.states_real[i]
-            del self.states_imag[i]
-            del self.hamiltonians[i]
-        mempool.free_all_blocks()
-        pinned_mempool.free_all_blocks()
+        try:
+            # Check if lists exist and have elements before deleting
+            if hasattr(self, 'states_real') and self.states_real:
+                for i in range(min(len(self.states_real), self.num_streams)):
+                    if i < len(self.states_real):
+                        del self.states_real[i]
+            
+            if hasattr(self, 'states_imag') and self.states_imag:
+                for i in range(min(len(self.states_imag), self.num_streams)):
+                    if i < len(self.states_imag):
+                        del self.states_imag[i]
+            
+            if hasattr(self, 'hamiltonians') and self.hamiltonians:
+                for i in range(min(len(self.hamiltonians), self.num_streams)):
+                    if i < len(self.hamiltonians):
+                        del self.hamiltonians[i]
+            
+            mempool.free_all_blocks()
+            pinned_mempool.free_all_blocks()
+        except Exception as e:
+            print(f"⚠️ Cleanup warning: {e}")
 
 
 def main():
