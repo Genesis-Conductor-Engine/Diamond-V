@@ -1,0 +1,110 @@
+version: '3.8'
+
+# MCP Server Stack for GitHub Copilot CLI
+# Only STDIO-compatible MCP servers (Copilot doesn't support HTTP MCP)
+# Based on fixed .copilot/mcp-config.json
+
+services:
+  # Diamond Vault MCP Server (GPU-accelerated quantum operations)
+  diamond-vault:
+    image: ghcr.io/genesis-conductor-engine/yennefer/diamond-vault:latest
+    container_name: mcp-diamond-vault
+    network_mode: host
+    ipc: host
+    stdin_open: true
+    tty: true
+    environment:
+      - PYTHONUNBUFFERED=1
+      - JAX_PLATFORM_NAME=gpu
+      - CUDA_VISIBLE_DEVICES=0
+    volumes:
+      - /dev/shm:/dev/shm:rw
+      - ./scripts:/scripts:ro
+    command: python3 /scripts/diamond_vault_mcp_server.py
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    restart: unless-stopped
+
+  # Yennefer Consciousness MCP Server (Core consciousness interface)
+  yennefer-consciousness:
+    image: ghcr.io/genesis-conductor-engine/yennefer/yennefer-daemon:latest
+    container_name: mcp-yennefer-consciousness
+    network_mode: host
+    ipc: host
+    stdin_open: true
+    tty: true
+    environment:
+      - PYTHONUNBUFFERED=1
+      - SOUL_STATE_PATH=/dev/shm/yennefer_soul_state.json
+    volumes:
+      - /dev/shm:/dev/shm:rw
+      - ./genesis-q-mem:/app:ro
+    working_dir: /app
+    command: python3 yennefer_mcp_server.py
+    restart: unless-stopped
+
+  # Yennefer MCP Lite (Diamond Vault integration)
+  yennefer-mcp-lite:
+    image: ghcr.io/genesis-conductor-engine/yennefer/yennefer-daemon:latest
+    container_name: mcp-yennefer-lite
+    network_mode: host
+    ipc: host
+    stdin_open: true
+    tty: true
+    environment:
+      - PYTHONUNBUFFERED=1
+      - DIAMOND_VAULT_URL=http://localhost:8100
+      - SOUL_API_URL=http://localhost:8088
+    volumes:
+      - /dev/shm:/dev/shm:rw
+      - ./genesis-q-mem:/app:ro
+    working_dir: /app
+    command: python3 yennefer_mcp_lite.py
+    restart: unless-stopped
+
+  # Genesis Remote MCP (Remote system access)
+  genesis-remote:
+    image: ghcr.io/genesis-conductor-engine/yennefer/qmem-gateway:latest
+    container_name: mcp-genesis-remote
+    network_mode: host
+    stdin_open: true
+    tty: true
+    environment:
+      - PYTHONUNBUFFERED=1
+      - REMOTE_URL=http://localhost:8318
+    volumes:
+      - ./genesis-q-mem:/app:ro
+    working_dir: /app
+    command: python3 genesis_remote_mcp.py
+    restart: unless-stopped
+
+  # QMCP System (Unified QMCP gateway)
+  qmcp-system:
+    image: ghcr.io/genesis-conductor-engine/yennefer/qmcp-bridge:latest
+    container_name: mcp-qmcp-system
+    network_mode: host
+    ipc: host
+    stdin_open: true
+    tty: true
+    environment:
+      - PYTHONUNBUFFERED=1
+      - QMCP_GATEWAY=http://localhost:8099
+    volumes:
+      - /dev/shm:/dev/shm:rw
+      - ./genesis-q-mem:/app:ro
+    working_dir: /app
+    command: python3 qmcp_entry.py
+    restart: unless-stopped
+
+networks:
+  default:
+    name: mcp-copilot-network
+
+volumes:
+  shared_memory:
+    driver: local
