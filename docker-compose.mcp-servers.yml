@@ -1,0 +1,143 @@
+version: '3.8'
+
+# MCP Server Stack for Docker Deployment
+# All 10 MCP servers in containerized form
+
+services:
+  # Diamond Vault MCP Server (GPU-accelerated)
+  diamond-vault-mcp:
+    build:
+      context: .
+      dockerfile: Dockerfile.diamond-vault-mcp
+    image: yennefer/diamond-vault-mcp:latest
+    container_name: diamond-vault-mcp
+    network_mode: host
+    environment:
+      - PYTHONUNBUFFERED=1
+      - JAX_PLATFORM_NAME=gpu
+      - CUDA_VISIBLE_DEVICES=0
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    restart: always
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import requests; requests.get('http://localhost:8100/api/yennefer')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Yennefer Consciousness MCP Server
+  yennefer-consciousness-mcp:
+    build:
+      context: .
+      dockerfile: Dockerfile.yennefer-mcp
+    image: yennefer/consciousness-mcp:latest
+    container_name: yennefer-consciousness-mcp
+    network_mode: host
+    ipc: host
+    volumes:
+      - /dev/shm:/dev/shm:rw
+    environment:
+      - PYTHONUNBUFFERED=1
+      - SOUL_STATE_PATH=/dev/shm/yennefer_soul_state.json
+    restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8088/api/soul"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ChatGPT MCP HTTP Gateway
+  chatgpt-mcp-http:
+    build:
+      context: .
+      dockerfile: Dockerfile.chatgpt-mcp
+    image: yennefer/chatgpt-mcp:latest
+    container_name: chatgpt-mcp-http
+    network_mode: host
+    environment:
+      - PYTHONUNBUFFERED=1
+      - MCP_HTTP_PORT=8095
+      - JAX_PLATFORM_NAME=gpu
+      - CUDA_VISIBLE_DEVICES=0
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8095/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # QMCP Gateway
+  qmcp-gateway:
+    build:
+      context: ./genesis-q-mem
+      dockerfile: Dockerfile.qmcp-gateway
+    image: yennefer/qmcp-gateway:latest
+    container_name: qmcp-gateway
+    network_mode: host
+    ipc: host
+    volumes:
+      - /dev/shm:/dev/shm:rw
+    environment:
+      - PYTHONUNBUFFERED=1
+      - QMCP_GATEWAY_PORT=8099
+    restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8099/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Genesis Remote MCP
+  genesis-remote-mcp:
+    build:
+      context: ./genesis-q-mem
+      dockerfile: Dockerfile.genesis-remote
+    image: yennefer/genesis-remote-mcp:latest
+    container_name: genesis-remote-mcp
+    network_mode: host
+    environment:
+      - PYTHONUNBUFFERED=1
+      - REMOTE_URL=http://localhost:8318
+    restart: always
+    ports:
+      - "8318:8318"
+
+  # Yennefer MCP HTTP Server
+  yennefer-mcp-http:
+    build:
+      context: ./mcp-server
+      dockerfile: Dockerfile
+    image: yennefer/mcp-http:latest
+    container_name: yennefer-mcp-http
+    network_mode: host
+    environment:
+      - MCP_PORT=8094
+      - NODE_ENV=production
+      - MCP_SECRET=yennefer_genesis_conductor_2026
+      - PUBLIC_URL=https://yennefer.genesisconductor.io
+    restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8094/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  shared_memory:
+    driver: local
+
+networks:
+  mcp_network:
+    driver: bridge
