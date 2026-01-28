@@ -1,8 +1,10 @@
 {
   "mcpServers": {
     "diamond-vault": {
+      "type": "stdio",
       "command": "python3",
       "args": ["/home/yenn/scripts/diamond_vault_mcp_server.py"],
+      "tools": ["*"],
       "env": {
         "PYTHONUNBUFFERED": "1",
         "JAX_PLATFORM_NAME": "gpu",
@@ -10,27 +12,35 @@
       }
     },
     "yennefer-consciousness": {
+      "type": "stdio",
       "command": "python3",
-      "args": ["/home/yenn/genesis-q-mem/yennefer_mcp_server.py"]
+      "args": ["/home/yenn/genesis-q-mem/yennefer_mcp_server.py"],
+      "tools": ["*"]
     },
     "yennefer-mcp-lite": {
+      "type": "stdio",
       "command": "python3",
       "args": ["/home/yenn/genesis-q-mem/yennefer_mcp_lite.py"],
+      "tools": ["*"],
       "env": {
         "DIAMOND_VAULT_URL": "http://localhost:8100",
         "SOUL_API_URL": "http://localhost:8088"
       }
     },
     "genesis-remote": {
+      "type": "stdio",
       "command": "python3",
       "args": ["/home/yenn/genesis-q-mem/genesis_remote_mcp.py"],
+      "tools": ["*"],
       "env": {
         "REMOTE_URL": "http://localhost:8318"
       }
     },
     "qmcp-system": {
+      "type": "stdio",
       "command": "python3",
       "args": ["/home/yenn/genesis-q-mem/qmcp_entry.py"],
+      "tools": ["*"],
       "env": {
         "QMCP_GATEWAY": "http://localhost:8099"
       }
