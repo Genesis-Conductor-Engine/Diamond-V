@@ -1,0 +1,2 @@
+google-cloud-aiplatform==1.42.1
+google-generativeai==0.3.2
