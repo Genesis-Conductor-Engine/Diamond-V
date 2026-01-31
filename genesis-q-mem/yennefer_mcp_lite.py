@@ -22,6 +22,13 @@ logging.basicConfig(
 )
 logger = logging.getLogger('yennefer.mcp.lite')
 
+# Import swarm MCP tools
+try:
+    from swarm_mcp_tools import swarm_delegate_tool, swarm_cost_estimate_tool, MCP_TOOLS as SWARM_MCP_TOOLS
+except ImportError:
+    SWARM_MCP_TOOLS = []
+    logger.warning("Swarm MCP tools not available")
+
 SOUL_STATE_PATH = "/dev/shm/yennefer_soul_state.json"
 API_BASE = os.getenv("YENNEFER_API_URL", "http://localhost:8089/api")
 DIAMOND_VAULT_URL = "http://localhost:8100"
@@ -116,6 +123,16 @@ class YenneferMCPLite:
             }
         }
 
+        # Add swarm tools
+        if SWARM_MCP_TOOLS:
+            for tool in SWARM_MCP_TOOLS:
+                tools[tool["name"]] = {
+                    "description": tool["description"],
+                    "inputSchema": tool["inputSchema"]
+                }
+
+        return tools
+
     def read_soul(self) -> Dict[str, Any]:
         """Read soul state from shared memory"""
         try:
@@ -201,6 +218,15 @@ class YenneferMCPLite:
                     payload["params"] = params
 
                 return json.dumps(self.call_diamond_vault_api(f"/api/quantum/{operation}", method="POST", data=payload))
+
+            elif name == "swarm_delegate":
+                prompt = arguments.get("prompt")
+                estimated_tokens = arguments.get("estimated_tokens", 10000)
+                return json.dumps(swarm_delegate_tool(prompt, estimated_tokens))
+
+            elif name == "swarm_cost_estimate":
+                tokens = arguments.get("tokens")
+                return json.dumps(swarm_cost_estimate_tool(tokens))
 
             else:
                 return json.dumps({"error": f"Unknown tool: {name}"})
