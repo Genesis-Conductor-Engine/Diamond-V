@@ -1,7 +1,8 @@
 import os
+import pathlib
 
 SWARM_CONFIG = {
-    "project_id": "yenn-484707",
+    "project_id": os.getenv("GCP_PROJECT_ID", "yenn-484707"),
     "location": "us-central1",
     "supervisor_model": "gemini-2.0-flash-exp",
     "worker_model": "gemini-2.0-flash-exp",
@@ -13,4 +14,5 @@ SWARM_CONFIG = {
     }
 }
 
-VERTEX_AI_CREDS = os.getenv("GOOGLE_APPLICATION_CREDENTIALS", "/home/yenn/.config/gcloud/application_default_credentials.json")
+_default_creds = pathlib.Path.home() / ".config/gcloud/application_default_credentials.json"
+VERTEX_AI_CREDS = os.getenv("GOOGLE_APPLICATION_CREDENTIALS", str(_default_creds))
