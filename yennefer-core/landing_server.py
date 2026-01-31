@@ -732,6 +732,11 @@ def dashboard_redirect():
     """Redirect to dashboard"""
     return redirect('https://dashboard.yennefer.quest')
 
+@app.route('/swarm')
+def swarm_landing():
+    """Swarm landing page with pricing"""
+    return render_template('swarm_landing.html')
+
 @app.route('/health')
 def health():
     """Health check endpoint"""
