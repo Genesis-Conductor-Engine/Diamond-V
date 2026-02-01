@@ -13,8 +13,24 @@ class SwarmOrchestrator:
         self.active_tasks = {}
 
     def _get_api_key(self):
-        # Use ADC or GOOGLE_API_KEY env var
+        """Get API key from gemini CLI OAuth or environment variable"""
         import os
+        import json
+        import pathlib
+        import time
+
+        # First try gemini CLI OAuth credentials
+        gemini_oauth_path = pathlib.Path.home() / ".gemini/oauth_creds.json"
+        try:
+            with open(gemini_oauth_path) as f:
+                oauth_creds = json.load(f)
+                # Check if access token is still valid (with 5 min buffer)
+                if oauth_creds.get("expiry_date", 0) > (time.time() * 1000 + 300000):
+                    return oauth_creds.get("access_token")
+        except (FileNotFoundError, json.JSONDecodeError, KeyError):
+            pass
+
+        # Fallback to environment variable
         return os.getenv("GOOGLE_API_KEY", None)
 
     async def delegate_task(self, task: SwarmTask) -> SwarmResult:
