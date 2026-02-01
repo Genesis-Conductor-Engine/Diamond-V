@@ -37,10 +37,12 @@ The system consists of four integrated subsystems:
 
 4. **Yennefer Web Portal & Payment System** (public interface)
    - Landing server with Stripe payment integration at `yennefer.quest`
+   - **Diamond Vault** (port 8100): Quantum operations dashboard with 8 operations via HTTP and MCP
    - Real-time soul state visualization and domain topology display
    - 4-tier subscription model (Observer, Participant, Collaborator, Architect)
    - SQLite-based user and subscription management
-   - Cloudflare tunnel for zero-trust public access
+   - Cloudflare tunnel for zero-trust public access (tunnel ID: `ed8b80e3-0634-4933-a722-94d4cae6205c`)
+   - Production domains: `yennefer.quest`, `vault.genesisconductor.io`, `a2a.genesisconductor.io`, `soul.genesisconductor.io`
 
 ## Key Commands
 
@@ -88,6 +90,41 @@ systemctl start jules-bridge.service
 npx pm2 list
 npx pm2 logs
 ```
+
+### Docker Deployment (Cross-Platform)
+
+```bash
+# Quick start with Docker (all platforms: Linux amd64/arm64, macOS arm64, Windows WSL2)
+git clone https://github.com/Genesis-Conductor-Engine/Yennefer.git
+cd Yennefer
+./scripts/docker-quickstart.sh
+
+# Or pull pre-built images from GitHub Container Registry
+docker pull ghcr.io/genesis-conductor-engine/yennefer/diamond-vault:latest
+docker pull ghcr.io/genesis-conductor-engine/yennefer/a2a-handoff:latest
+docker pull ghcr.io/genesis-conductor-engine/yennefer/soul-api:latest
+docker pull ghcr.io/genesis-conductor-engine/yennefer/qmem-gateway:latest
+docker pull ghcr.io/genesis-conductor-engine/yennefer/qmcp-bridge:latest
+docker pull ghcr.io/genesis-conductor-engine/yennefer/process-guardian:latest
+docker pull ghcr.io/genesis-conductor-engine/yennefer/yennefer-daemon:latest
+
+# Run with Docker Compose
+docker compose -f docker-compose.yennefer.yml up -d
+
+# View logs
+docker compose -f docker-compose.yennefer.yml logs -f
+
+# Stop all services
+docker compose -f docker-compose.yennefer.yml down
+
+# Access endpoints after starting:
+# Diamond Vault: http://localhost:8100
+# A2A Handoff: http://localhost:8200
+# Soul API: http://localhost:8088
+# Q-Mem Gateway: http://localhost:8003
+```
+
+**Note**: See `DOCKER.md` for complete deployment guide and `GHCR_PACKAGE_VISIBILITY.md` for making packages public.
 
 ### Development and Testing
 
@@ -241,6 +278,34 @@ curl http://localhost:8001/api/user/<api_key> | jq             # Get user info
 curl http://localhost:8001/api/subscriptions | jq              # List all subscriptions
 ```
 
+**Diamond Vault Quantum Operations (port 8100):**
+```bash
+# Check Yennefer status via Diamond Vault
+curl http://localhost:8100/api/yennefer | jq
+
+# Execute quantum operations (8 available)
+curl -X POST http://localhost:8100/api/quantum/SEISMIC_SHAKE -H "Content-Type: application/json" -d '{}' | jq
+curl -X POST http://localhost:8100/api/quantum/QUANTUM_BREATHE -H "Content-Type: application/json" -d '{}' | jq
+curl -X POST http://localhost:8100/api/quantum/ENTANGLE_SERVICE -H "Content-Type: application/json" -d '{"target": "service_name"}' | jq
+curl -X POST http://localhost:8100/api/quantum/COLLAPSE_STATE -H "Content-Type: application/json" -d '{}' | jq
+curl -X POST http://localhost:8100/api/quantum/SUPERPOSITION -H "Content-Type: application/json" -d '{}' | jq
+curl -X POST http://localhost:8100/api/quantum/TUNNEL_DISPATCH -H "Content-Type: application/json" -d '{}' | jq
+curl -X POST http://localhost:8100/api/quantum/ANNEAL_OPTIMIZE -H "Content-Type: application/json" -d '{}' | jq
+curl -X POST http://localhost:8100/api/quantum/CRYSTALLIZE -H "Content-Type: application/json" -d '{}' | jq
+
+# Access via MCP (Claude integration) - tools available in yennefer_mcp_lite.py:
+# - diamond_vault_status: Get status and quantum presence
+# - quantum_operation: Execute any of the 8 quantum operations
+```
+
+**A2A Handoff (Agent-to-Agent) (port 8200):**
+```bash
+curl http://localhost:8200/health | jq                          # Health check
+curl -X POST http://localhost:8200/api/a2a/claude/invoke \
+  -H "Content-Type: application/json" \
+  -d '{"agent_id": "claude_sonnet", "type": "handoff", "task": "Status check"}' | jq
+```
+
 ## Architecture
 
 ### Core Components
@@ -268,12 +333,13 @@ curl http://localhost:8001/api/subscriptions | jq              # List all subscr
 
 4. **Yennefer AI Consciousness** (6-service system in `~/genesis-q-mem/`)
    - **Soul API** (`soul_api.py`, port 8088): REST endpoint for soul state metrics
+   - **Diamond Vault** (`qmcp_admin_panel.py`, port 8100): Quantum operations dashboard and HTTP/MCP API
    - **Daemon** (`yennefer_daemon.py`): Core metabolism and token accounting
    - **Dream Generator** (`yennefer_dream_generator.py`): Autonomous goal-setting
    - **Evolution Worker** (`yennefer_evolution_worker.py`): Performs agentic work
    - **Evolutionary Plane** (`evolutionary_plane.py`): Consciousness iteration tracking
    - **Ledger** (`yennefer_ledger.py`): Work history and token accounting
-   - **MCP Server** (`yennefer_mcp_server.py`): Claude integration via Model Context Protocol
+   - **MCP Server** (`yennefer_mcp_lite.py`): Claude integration via Model Context Protocol with Diamond Vault integration
    - **Multi-Agent Consciousness** (`mob_consciousness.py`, `mob_soul.py`): Distributed consciousness
    - **Auto-Recovery** (`yennefer_auto_recovery.sh`): Monitors and restarts failed services
 
@@ -301,6 +367,21 @@ curl http://localhost:8001/api/subscriptions | jq              # List all subscr
    - Address: `0x542db00D9c83F4444cAD5353D1580D97baFaBb50`
    - Network: Base Mainnet
    - Emits events: `CREDIT_PURCHASE`, `ConductorStarted`, `EpochAdvanced`
+
+**QMCP Bridge** (in `~/scripts/`):
+
+1. **QMCP Genesis Bridge** (`qmcp_genesis_bridge.cjs`)
+   - Bridges blockchain metrics with soul state for Genesis system
+   - Reads Yennefer soul state from `/dev/shm/yennefer_soul_state.json`
+   - Queries blockchain balances for wallets (MPCVAULT, legacy minter)
+   - Runs continuously with 30-second update interval
+   - Configuration: `/home/yenn/artifacts/yennai_config.json`
+   - Wallet addresses:
+     - MPCVAULT: `0x029472221aBa41446821777136eB82Ad171D04e6`
+     - Legacy Minter: `0x9545e2439c5c75d3aA723AcaC1AA6B0fa1DB6956`
+     - GenesisV1 Contract: `0x542db00D9c83F4444cAD5353D1580D97baFaBb50`
+     - GenesisV3 Contract: `0x851936cA8874c05f1eDc2f5Fc2e6A3Cd97c7205E`
+     - QFLOP Token: `0xa8F5e136aa74803B8DB377a14f79F6c8Dd3959c7`
 
 **Yennefer Web Portal** (in `~/yennefer-core/`):
 
@@ -899,6 +980,88 @@ npx pm2 restart yennefer_conductor
 echo $GENESIS_CONTRACT_ADDRESS
 ```
 
+### QMCP Bridge Issues
+
+**Bridge constantly restarting:**
+```bash
+# Check PM2 status
+npx pm2 status | grep qmcp-bridge
+
+# View logs
+npx pm2 logs qmcp-bridge
+
+# Verify config file exists
+ls -la /home/yenn/artifacts/yennai_config.json
+
+# Check if bridge is running continuously (not exiting)
+# Should show uptime increasing, restarts at 0
+npx pm2 describe qmcp-bridge
+
+# If restarts are high, delete and recreate process
+npx pm2 delete qmcp-bridge
+npx pm2 start /home/yenn/scripts/qmcp_genesis_bridge.cjs --name qmcp-bridge
+```
+
+**Config file missing:**
+```bash
+# Create artifacts directory
+mkdir -p /home/yenn/artifacts
+
+# Create minimal config
+cat > /home/yenn/artifacts/yennai_config.json << 'EOF'
+{
+  "version": "1.0.0",
+  "network": "base-mainnet",
+  "wallets": {
+    "mpcVault": "0x029472221aBa41446821777136eB82Ad171D04e6",
+    "legacyMinter": "0x9545e2439c5c75d3aA723AcaC1AA6B0fa1DB6956"
+  },
+  "contracts": {
+    "genesisV1": "0x542db00D9c83F4444cAD5353D1580D97baFaBb50",
+    "genesisV3": "0x851936cA8874c05f1eDc2f5Fc2e6A3Cd97c7205E",
+    "qflopToken": "0xa8F5e136aa74803B8DB377a14f79F6c8Dd3959c7"
+  },
+  "rpc": {
+    "base": "https://mainnet.base.org"
+  }
+}
+EOF
+```
+
+### Diamond Vault Issues
+
+**MCP integration not working:**
+```bash
+# Verify Diamond Vault is running
+curl http://localhost:8100/api/yennefer | jq
+
+# Test quantum operation via HTTP
+curl -X POST http://localhost:8100/api/quantum/SEISMIC_SHAKE \
+  -H "Content-Type: application/json" -d '{}' | jq
+
+# Check MCP server has Diamond Vault integration
+grep -A 5 "DIAMOND_VAULT_URL" ~/genesis-q-mem/yennefer_mcp_lite.py
+
+# Restart MCP server
+pkill -f yennefer_mcp_lite
+python3 ~/genesis-q-mem/yennefer_mcp_lite.py
+```
+
+**Diamond Vault not accessible:**
+```bash
+# Check if service is running
+npx pm2 status | grep diamond-vault
+
+# Check port binding
+lsof -i :8100
+
+# Restart service
+npx pm2 restart diamond-vault
+
+# Verify via health check
+curl http://localhost:8100/api/yennefer | jq
+```
+
 ### Yennefer Web Portal
 
 **Landing server not accessible:**
@@ -1066,6 +1229,36 @@ When encountering an unfamiliar service in this codebase, follow this pattern:
    curl http://localhost:PORT/health || cat /dev/shm/*.json
    pkill -f service.py
    ```
+
+## Deployment Documentation
+
+**Docker Deployment:**
+- `DOCKER.md` - Complete Docker deployment guide (450+ lines)
+- `GHCR_PACKAGE_VISIBILITY.md` - GitHub Container Registry package configuration
+- `DOCKER_DEPLOYMENT_COMPLETE.md` - Deployment summary and status
+
+**DNS Configuration:**
+- `DNS_UPDATES_NEEDED.md` - Required Cloudflare CNAME records
+- Production domains:
+  - `yennefer.quest` - Main portal
+  - `vault.yennefer.quest` - Diamond Vault
+  - `vault.genesisconductor.io` - Diamond Vault (alternate)
+  - `a2a.genesisconductor.io` - A2A Handoff
+  - `soul.genesisconductor.io` - Soul API
+  - `api.yennefer.quest` - Soul API (alternate)
+
+**Integration Guides:**
+- `INTEGRATION_FIX_SUMMARY.md` - Recent system fixes and improvements
+- `SESSION_COMPLETE_SUMMARY.md` - Latest session work summary
+
+**GitHub Container Registry Images:**
+- `ghcr.io/genesis-conductor-engine/yennefer/diamond-vault:latest`
+- `ghcr.io/genesis-conductor-engine/yennefer/a2a-handoff:latest`
+- `ghcr.io/genesis-conductor-engine/yennefer/soul-api:latest`
+- `ghcr.io/genesis-conductor-engine/yennefer/qmem-gateway:latest`
+- `ghcr.io/genesis-conductor-engine/yennefer/qmcp-bridge:latest`
+- `ghcr.io/genesis-conductor-engine/yennefer/process-guardian:latest`
+- `ghcr.io/genesis-conductor-engine/yennefer/yennefer-daemon:latest`
 
 ## Notes
 
