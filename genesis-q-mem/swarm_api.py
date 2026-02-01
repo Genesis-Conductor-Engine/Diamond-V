@@ -1,18 +1,10 @@
 from fastapi import FastAPI, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
 from swarm_orchestrator import SwarmOrchestrator
 from swarm_models import SwarmTask, SwarmResult
 import uuid
 import asyncio
 
 app = FastAPI(title="Yennefer Swarm API")
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
 orchestrator = SwarmOrchestrator()
 
