@@ -1,0 +1,62 @@
+{
+  "$schema": "https://www.schemastore.org/schemas/json/claude-code-marketplace.json",
+  "name": "genesis-conductor-diamond-v",
+  "owner": {
+    "name": "Igor Holt (@invariantx)",
+    "email": "iholt@mymail.aacc.edu",
+    "url": "https://github.com/igor-holt"
+  },
+  "description": "Diamond-V: Genesis Conductor Diamond Vault Repository by Igor Holt (@invariantx). Central vault for the Yennefer Genesis Conductor stack containing production MCP servers (diamond-vault, yennefer-consciousness, qmcp-system, genesis-remote), quantum operations tooling (GPU-accelerated hashing at 1796 hash/s on T4, quantum_verify, merkle roots, Ed25519 manifests, knowledge graph queries), Q-Mem benchmarking with cryptographic attestation, Hardhat Solidity contracts for Genesis protocol, Docker Compose for diamond-vault-mcp and full stack, architecture blueprints, and integration configs for Claude Desktop, Copilot, Gemini, and OpenCode AI. Powers thermodynamic verification, A2A coordination, soul-state management, and multi-agent orchestration in the Genesis Conductor Engine. Composes with Yennefer conductor, vivarium simulations, and the openclaw-skills marketplace (grok-persistent-state + mcp-openclaw-bridge + smithery-mcp-orchestrator) for persistent agent memory and MCP skill publishing. Essential MCP and quantum infrastructure for autonomous Genesis Conductor systems.",
+  "version": "1.0.0",
+  "homepage": "https://github.com/Genesis-Conductor-Engine/Diamond-V",
+  "keywords": [
+    "diamond-v",
+    "diamond-vault",
+    "genesis-conductor",
+    "igor-holt",
+    "invariantx",
+    "mcp-server",
+    "quantum-operations",
+    "q-mem",
+    "thermodynamic-verification",
+    "a2a",
+    "claude-desktop-mcp",
+    "gpu-accelerated",
+    "knowledge-graph",
+    "agent-infrastructure",
+    "mcp-tools",
+    "solidity-contracts",
+    "openclaw",
+    "qmcp",
+    "soul-api",
+    "genesis-protocol"
+  ],
+  "plugins": [
+    {
+      "name": "diamond-vault-mcp",
+      "source": "https://github.com/Genesis-Conductor-Engine/Diamond-V",
+      "description": "Diamond Vault MCP server and quantum operations suite for Genesis Conductor / Yennefer by @invariantx. Exposes tools: quantum_hash (1796/s on T4), quantum_verify, quantum_merkle_root, create_manifest (Ed25519), kg_query (288-node knowledge graph). HTTP and stdio MCP endpoints (port 8100). Integrated with Q-Mem, yennefer-soul-api, qmcp-gateway. Full inventory of MCP servers for Claude, Copilot and agent use. Docker deployment via Dockerfile.diamond-vault-mcp and compose files. Core for thermodynamic verification, verifiable manifests, and agent tool exposure in the Genesis Conductor ecosystem. Pairs with openclaw-skills mcp-openclaw-bridge for publishing these as installable skills.",
+      "version": "1.0.0",
+      "tags": ["diamond-vault", "mcp", "quantum", "genesis-conductor", "knowledge-graph"],
+      "category": "mcp-tools",
+      "homepage": "https://github.com/Genesis-Conductor-Engine/Diamond-V",
+      "keywords": ["diamond vault mcp server", "quantum hash verify merkle", "genesis conductor mcp", "claude desktop diamond-vault", "thermodynamic verification tools", "igor holt invariantx"]
+    },
+    {
+      "name": "yennefer-consciousness-mcp",
+      "source": "https://github.com/Genesis-Conductor-Engine/Diamond-V",
+      "description": "Yennefer consciousness and Q-Mem MCP servers bundled in Diamond-V. Tools for live soul_state, dream_journal, ledger queries, qflop, blockchain status, remote dispatch. Part of the full Yennefer Brain-Body-Soul + Diamond Vault stack for Genesis Conductor autonomous agents.",
+      "version": "1.0.0",
+      "tags": ["yennefer", "q-mem", "mcp", "consciousness", "genesis-conductor"],
+      "category": "agent-infrastructure",
+      "homepage": "https://github.com/Genesis-Conductor-Engine/Diamond-V",
+      "keywords": ["yennefer mcp", "soul state mcp", "q-mem benchmarking", "genesis conductor consciousness"]
+    }
+  ],
+  "links": {
+    "x": "https://x.com/invariantx",
+    "website": "https://genesisconductor.io",
+    "github": "https://github.com/Genesis-Conductor-Engine/Diamond-V",
+    "openclaw-skills-marketplace": "https://github.com/igor-holt/openclaw-skills"
+  }
+}
